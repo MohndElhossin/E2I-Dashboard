@@ -117,7 +117,7 @@
 
     // Load devices
     function loadDashboard() {
-       const container = document.getElementById("device-list");
+       const container = document.getElementById("devices");
       db.ref("devices").on("value", (snapshot) => {
         const data = snapshot.val() || {};
         container.innerHTML = "";
