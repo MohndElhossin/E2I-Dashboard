@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+ <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1e1e1e;
+      --card: #f0f0f0;
+      --accent: #007bff;
+      --border: #cccccc;
+    }
+    .dark {
+      --bg: #121212;
+      --fg: #f0f0f0;
+      --card: #1e1e1e;
+      --accent: #66ccff;
+      --border: #444444;
+    }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    form {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #0002;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .toggle-theme {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+  </style>
+  </head>
+<body>
+  <button class="toggle-theme" onclick="toggleTheme()">🌙</button>
+  <h2>Sign Up</h2>
+  <form onsubmit="signup(event)">
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button type="submit">Sign Up</button>
+  </form>
+  <p><a href="login.html">Already have an account? Log in</a></p>
+
+  <script>
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function signup(e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(user => {
+          const uid = user.user.uid;
+          db.ref("pending_users/" + uid).set({ email: email, approved: false });
+          alert("Signup complete. Waiting for approval.");
+          window.location.href = "login.html";
+        })
+        .catch(err => alert(err.message));
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>

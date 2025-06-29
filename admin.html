@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Approve Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 2em;
+      background-color: var(--bg);
+      color: var(--fg);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --fg: #222222;
+      --card: #f5f5f5;
+      --border: #ccc;
+    }
+
+    .dark {
+      --bg: #1e1e1e;
+      --fg: #ffffff;
+      --card: #2b2b2b;
+      --border: #555;
+    }
+
+    h2 {
+      margin-bottom: 1em;
+    }
+
+    .user-card {
+      border: 1px solid var(--border);
+      padding: 1em;
+      background: var(--card);
+      margin-bottom: 1em;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toggle-theme {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+    }
+
+    button {
+      padding: 0.4em 0.8em;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+
+    #logout {
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pending User Approvals</h2>
+  <button class="toggle-theme" onclick="toggleTheme()">🌙 Toggle Theme</button>
+  <div id="userList">Loading...</div>
+  <button id="logout" onclick="logout()">Logout</button>
+
+  <script>
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    // Load saved theme
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (!user) return window.location.href = "login.html";
+
+      const adminUIDs = []; // 🔐 Add your UID here
+      if (!adminUIDs.includes(user.uid)) {
+        alert("Access denied — Admins only.");
+        auth.signOut();
+        return window.location.href = "login.html";
+      }
+
+      db.ref("pending_users").on("value", snap => {
+        const container = document.getElementById("userList");
+        container.innerHTML = "";
+
+        snap.forEach(child => {
+          const { email, approved } = child.val();
+          if (!approved) {
+            const div = document.createElement("div");
+            div.className = "user-card";
+            div.innerHTML = `
+              <span>${email}</span>
+              <button onclick="approve('${child.key}')">✅ Approve</button>
+            `;
+            container.appendChild(div);
+          }
+        });
+
+        if (container.innerHTML === "") {
+          container.innerHTML = "<p>No pending users.</p>";
+        }
+      });
+    });
+
+    function approve(uid) {
+      db.ref("pending_users/" + uid + "/approved").set(true);
+      alert("User approved.");
+    }
+
+    function logout() {
+      auth.signOut().then(() => window.location.href = "login.html");
+    }
+  </script>
+</body>
+</html>
