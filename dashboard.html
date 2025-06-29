@@ -70,8 +70,11 @@
     const db = firebase.database();
     const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // 🔐 Add your UID here
    firebase.auth().onAuthStateChanged(user => {
-  if (!user) return location.href = "login.html";
-
+  if (!user)
+  {
+   console.log("UID:", user.uid);  // <- this is a string
+    return location.href = "login.html";
+  }
   if (adminUIDs.includes(user.uid)) {
     console.log("Logged in as admin:", user.uid);
     loadDashboard();
