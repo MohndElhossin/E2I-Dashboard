@@ -73,7 +73,7 @@
   if (!user) return location.href = "login.html";
 
   if (adminUIDs.includes(user.uid)) {
-    // ✅ Admins can skip approval
+    console.log("Logged in as admin:", user.uid);
     loadDashboard();
   } else {
     firebase.database().ref("pending_users/" + user.uid).get().then(snap => {
