@@ -68,12 +68,12 @@
   <script>
     const auth = firebase.auth();
     const db = firebase.database();
-
+    const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // 🔐 Add your UID here
     auth.onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
 
       db.ref("pending_users/" + user.uid).get().then(snap => {
-        if (!snap.exists() || !snap.val().approved) {
+        if (!snap.exists() || !snap.val().approved ||(!adminUIDs.includes(user.uid))) {
           alert("Not approved yet.");
           auth.signOut();
           return window.location.href = "login.html";
