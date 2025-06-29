@@ -89,7 +89,7 @@
     auth.onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
 
-      const adminUIDs = []; // 🔐 Add your UID here
+      const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // 🔐 Add your UID here
       if (!adminUIDs.includes(user.uid)) {
         alert("Access denied — Admins only.");
         auth.signOut();
