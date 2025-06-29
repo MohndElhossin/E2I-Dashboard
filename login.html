@@ -67,7 +67,9 @@
     <button type="submit">Login</button>
   </form>
   <p><a href="signup.html">No account? Sign up</a></p>
-
+  <p>
+  <a href="#" onclick="forgotPassword()">Forgot password?</a>
+  </p>
   <script>
     const auth = firebase.auth();
 
@@ -88,6 +90,21 @@
     if (localStorage.getItem("theme") === "dark") {
       document.body.classList.add("dark");
     }
+    function forgotPassword() {
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    return alert("Please enter your email first.");
+  }
+
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(() => {
+      alert("Password reset email sent. Check your inbox.");
+    })
+    .catch(err => {
+      alert("Error: " + err.message);
+    });
+}
+
   </script>
 </body>
 </html>
