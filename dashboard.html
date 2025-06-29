@@ -121,7 +121,7 @@
   db.ref("devices").on("value", (snapshot) => {
     const devices = snapshot.val() || {};
     container.innerHTML = ""; // Clear old content
-
+    console.log(devices);
     Object.entries(devices).forEach(([id, dev]) => {
       if (!dev || typeof dev !== "object" || !dev.sn) return;
 
