@@ -69,34 +69,41 @@
     const auth = firebase.auth();
     const db = firebase.database();
     const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // 🔐 Add your UID here
-    auth.onAuthStateChanged(user => {
-      if (!user) return window.location.href = "login.html";
+   firebase.auth().onAuthStateChanged(user => {
+  if (!user) return location.href = "login.html";
 
-      db.ref("pending_users/" + user.uid).get().then(snap => {
-        if (!snap.exists() || !snap.val().approved ||(!adminUIDs.includes(user.uid))) {
-          alert("Not approved yet.");
-          auth.signOut();
-          return window.location.href = "login.html";
-        }
-
-        db.ref("devices").on("value", snap => {
-          const data = snap.val() || {};
-          const div = document.getElementById("devices");
-          div.innerHTML = "";
-
-          Object.entries(data).forEach(([key, val]) => {
-            div.innerHTML += `
-              <div style="background: var(--card); border: 1px solid var(--border); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-                <strong>SN:</strong> ${val.sn}<br>
-                <strong>HW:</strong> ${val.hw_version}<br>
-                <strong>SW:</strong> ${val.sw_version}<br>
-                <strong>Customer:</strong> ${val.customer}
-              </div>
-            `;
-          });
-        });
-      });
+  if (adminUIDs.includes(user.uid)) {
+    // ✅ Admins can skip approval
+    loadDashboard();
+  } else {
+    firebase.database().ref("pending_users/" + user.uid).get().then(snap => {
+      if (!snap.exists() || !snap.val().approved) {
+        alert("You are not approved yet.");
+        firebase.auth().signOut();
+        location.href = "login.html";
+      } else {
+        loadDashboard();
+      }
     });
+  }
+});
+       function loadDashboard() {
+  firebase.database().ref("devices").on("value", snap => {
+    const data = snap.val() || {};
+    const div = document.getElementById("devices");
+    div.innerHTML = "";
+    Object.entries(data).forEach(([id, dev]) => {
+      div.innerHTML += `
+        <div style="background: var(--card); padding: 1rem; margin: 1rem 0; border-radius: 8px;">
+          <b>SN:</b> ${dev.sn}<br>
+          <b>HW:</b> ${dev.hw_version}<br>
+          <b>SW:</b> ${dev.sw_version}<br>
+          <b>Customer:</b> ${dev.customer}
+        </div>
+      `;
+    });
+  });
+}
 
     function logout() {
       auth.signOut().then(() => window.location.href = "login.html");
