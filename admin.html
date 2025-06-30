@@ -327,14 +327,12 @@
       );
     }
 
-   async function approveUser(pendingId) {
+  async function approveUser(pendingId) {
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
   try {
-    const adminEmail = adminUser.email;
-    const adminPassword = prompt("Confirm your admin password");
-    // Verify admin status
+    // Verify admin status first
     const adminSnapshot = await db.ref(`admins/${adminUser.uid}`).once('value');
     if (!adminSnapshot.exists()) {
       throw new Error("You don't have admin privileges");
@@ -343,32 +341,35 @@
     // Get pending user data
     const pendingSnapshot = await db.ref(`pending_users/${pendingId}`).once('value');
     const userData = pendingSnapshot.val();
-    
     if (!userData) throw new Error("User not found");
 
-    // Create auth account (using client SDK - for simplicity)
+    // Store admin email for reauthentication
+    const adminEmail = adminUser.email;
+    
+    // Create the auth account
     const userCredential = await auth.createUserWithEmailAndPassword(
       userData.email, 
       userData.password
     );
-     await auth.signOut();
+    const uid = userCredential.user.uid; // Use Firebase-generated UID
     
-    // Sign back in as admin
-    await auth.signInWithEmailAndPassword(adminEmail, adminPassword);
-    const uid = userData.email.replace(/\./g, '_').replace(/@/g, '_');
+    // Immediately sign out the new user
+    await auth.signOut();
+    
+    // Sign back in as admin (using stored email)
+    await auth.signInWithEmailAndPassword(adminEmail, prompt("Confirm your admin password"));
 
     // Update database records
     const updates = {
-      [`pending_users/${uid}/approved`]: true,
-      [`pending_users/${uid}/approved_by`]: adminUser.uid,
-      [`pending_users/${uid}/approved_at`]: Date.now(),
-      [`users/${uid}`]: {
+      [`pending_users/${pendingId}/approved`]: true,
+      [`pending_users/${pendingId}/approved_by`]: adminUser.uid,
+      [`pending_users/${pendingId}/approved_at`]: Date.now(),
+      [`pending_users/${pendingId}/password`]: null, // Remove password
+      [`users/${uid}`]: { // Use the Auth-generated UID
         email: userData.email,
         approved: true,
-        created_at: userData.created_at
-      },
-      // Remove password
-      [`pending_users/${uid}/password`]: null
+        created_at: userData.created_at || Date.now()
+      }
     };
 
     await db.ref().update(updates);
@@ -378,22 +379,17 @@
   } catch (error) {
     console.error("Approval failed:", error);
     alert("Approval failed: " + error.message);
+    
+    // Try to restore admin session if something went wrong
+    if (auth.currentUser === null && adminUser?.email) {
+      try {
+        await auth.signInWithEmailAndPassword(adminUser.email, adminPassword);
+      } catch (e) {
+        console.error("Failed to restore admin session:", e);
+      }
+    }
   }
 }
-    function showError(message) {
-      const container = document.getElementById("userList");
-      container.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error</h3>
-          <p>${message}</p>
-          <button class="btn btn-primary" onclick="loadPendingUsers()">
-            <i class="fas fa-sync-alt"></i> Retry
-          </button>
-        </div>
-      `;
-    }
-
     function logout() {
       auth.signOut().then(() => {
         window.location.href = "login.html";
