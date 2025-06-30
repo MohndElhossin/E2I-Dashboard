@@ -118,8 +118,9 @@
   function loadDashboard() {
   const container = document.getElementById("devices");
 
-  db.ref("devices").on("value", (snapshot) => {
-    const devices = snapshot.val() || {};
+  const devicesRef = ref(db, "devices");
+    onValue(devicesRef, (snapshot) => {
+      const devices = snapshot.val() || {};
     container.innerHTML = ""; // Clear old content
     console.log(devices);
     Object.entries(devices).forEach(([id, dev]) => {
