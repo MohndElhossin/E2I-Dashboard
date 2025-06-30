@@ -485,6 +485,13 @@ async function logout() {
   await auth.signOut();
   window.location.href = "login.html";
 }
+async function clearSession() {
+  const session = JSON.parse(localStorage.getItem('session'));
+  if (session?.uid) {
+    await db.ref(`sessions/${session.uid}`).remove();
+  }
+  localStorage.removeItem('session');
+}
   </script>
 </body>
 </html>
