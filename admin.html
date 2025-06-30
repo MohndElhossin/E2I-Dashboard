@@ -328,51 +328,52 @@
     }
 
    async function approveUser(pendingId) {
+  const adminUser = auth.currentUser;
+  if (!adminUser) return;
+
   try {
-    const pendingRef = db.ref("pending_users/" + pendingId);
-    const snapshot = await pendingRef.once('value');
-    const userData = snapshot.val();
-    
-    if (!userData) {
-      throw new Error("User not found");
+    // Verify admin status
+    const adminSnapshot = await db.ref(`admins/${adminUser.uid}`).once('value');
+    if (!adminSnapshot.exists()) {
+      throw new Error("You don't have admin privileges");
     }
 
-    // 1. Create the auth account
+    // Get pending user data
+    const pendingSnapshot = await db.ref(`pending_users/${pendingId}`).once('value');
+    const userData = pendingSnapshot.val();
+    
+    if (!userData) throw new Error("User not found");
+
+    // Create auth account (using client SDK - for simplicity)
     const userCredential = await auth.createUserWithEmailAndPassword(
       userData.email, 
       userData.password
     );
     const uid = userCredential.user.uid;
 
-    // 2. Mark as approved and store admin info
+    // Update database records
     const updates = {
       [`pending_users/${pendingId}/approved`]: true,
-      [`pending_users/${pendingId}/approved_by`]: auth.currentUser.uid,
+      [`pending_users/${pendingId}/approved_by`]: adminUser.uid,
       [`pending_users/${pendingId}/approved_at`]: Date.now(),
-      [`users/${uid}`]: { // Optional: store in active users
+      [`users/${uid}`]: {
         email: userData.email,
         approved: true,
         created_at: userData.created_at
-      }
+      },
+      // Remove password
+      [`pending_users/${pendingId}/password`]: null
     };
 
-    // 3. Remove password from database
-    updates[`pending_users/${pendingId}/password`] = null;
-
     await db.ref().update(updates);
-    
-    // 4. (Optional) Send approval email to user
-    // You would implement this with a Cloud Function
-    
-    alert(`User ${userData.email} approved successfully!`);
-    loadPendingUsers(); // Refresh the list
-    
+    alert(`Approved user: ${userData.email}`);
+    loadPendingUsers();
+
   } catch (error) {
     console.error("Approval failed:", error);
     alert("Approval failed: " + error.message);
   }
 }
-
     function showError(message) {
       const container = document.getElementById("userList");
       container.innerHTML = `

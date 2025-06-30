@@ -254,48 +254,31 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    async function signup(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const submitBtn = document.getElementById("submitBtn");
-      const loading = document.getElementById("loading");
-      const form = document.querySelector('form');
-      const waitingDiv = document.getElementById("waitingApproval");
-      
-      // Show loading state
-      submitBtn.disabled = true;
-      loading.style.display = "flex";
-      
-      try {
-        // Store in pending_users (without creating auth account)
-        const newPendingRef = db.ref("pending_users").push();
-        await newPendingRef.set({
-          email: email,
-          password: password, // Note: In production, you should NEVER store raw passwords
-          approved: false,
-          created_at: Date.now()
-        });
+   async function signup(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  
+  try {
+    // Store in pending_users without creating auth account
+    const newPendingRef = db.ref("pending_users").push();
+    await newPendingRef.set({
+      email: email,
+      password: password, // Note: In production, consider more secure approaches
+      approved: false,
+      created_at: Date.now()
+    });
 
-        // Hide form and show waiting message
-        form.style.display = "none";
-        waitingDiv.style.display = "block";
-        
-      } catch (error) {
-        console.error("Signup error:", error);
-        submitBtn.disabled = false;
-        loading.style.display = "none";
-        
-        let errorMessage = "Signup failed. Please try again.";
-        if (error.code === "PERMISSION_DENIED") {
-          errorMessage = "Signup is currently unavailable. Please try again later.";
-        }
-        
-        document.getElementById("emailError").textContent = errorMessage;
-        document.getElementById("emailError").style.display = "block";
-      }
-    }
+    // Show success message
+    document.getElementById("formContainer").style.display = "none";
+    document.getElementById("successMessage").style.display = "block";
+    
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Signup failed: " + error.message);
+  }
+}
     // Convert Firebase error codes to friendly messages
     function getFriendlyErrorMessage(code) {
       switch(code) {
