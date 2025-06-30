@@ -4,96 +4,329 @@
   <meta charset="UTF-8" />
   <title>Sign Up</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="firebaseConfig.js"></script>
- <style>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
     :root {
-      --bg: #ffffff;
-      --fg: #1e1e1e;
-      --card: #f0f0f0;
-      --accent: #007bff;
-      --border: #cccccc;
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --card: #ffffff;
+      --primary: #4361ee;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --border: #e0e0e0;
     }
-    .dark {
+
+    [data-theme="dark"] {
       --bg: #121212;
-      --fg: #f0f0f0;
+      --text: #f5f5f5;
       --card: #1e1e1e;
-      --accent: #66ccff;
-      --border: #444444;
+      --border: #333333;
     }
+
     body {
       background: var(--bg);
-      color: var(--fg);
-      font-family: "Segoe UI", sans-serif;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
-      transition: background 0.3s, color 0.3s;
+      justify-content: center;
+      transition: all 0.3s ease;
     }
-    form {
-      background: var(--card);
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #0002;
-      width: 300px;
-    }
-    input, button {
+
+    .container {
       width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.6rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 1rem;
+      max-width: 400px;
+      padding: 20px;
     }
-    .toggle-theme {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
+
+    .auth-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-header h2 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .auth-header p {
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #7f8c8d;
+    }
+
+    .auth-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
       background: none;
       border: none;
-      font-size: 1.3rem;
+      font-size: 20px;
       cursor: pointer;
+      color: var(--text);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .loading {
+      display: none;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
-  </head>
-<body>
-  <button class="toggle-theme" onclick="toggleTheme()">🌙</button>
-  <h2>Sign Up</h2>
-  <form onsubmit="signup(event)">
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Sign Up</button>
-  </form>
-  <p><a href="login.html">Already have an account? Log in</a></p>
+</head>
+<body data-theme="light">
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+        <p>Register for a new account</p>
+      </div>
+
+      <form onsubmit="signup(event)">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-control" 
+            placeholder="Enter your email" 
+            required
+          >
+          <div id="emailError" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-control" 
+            placeholder="Create a password" 
+            required
+            minlength="6"
+          >
+          <div id="passwordError" class="error-message"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <i class="fas fa-user-plus"></i> Sign Up
+        </button>
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </div>
+  </div>
 
   <script>
     const auth = firebase.auth();
     const db = firebase.database();
 
-    function signup(e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(user => {
-          const uid = user.user.uid;
-          db.ref("pending_users/" + uid).set({ email: email, approved: false });
-          alert("Signup complete. Waiting for approval.");
-          window.location.href = "login.html";
-        })
-        .catch(err => alert(err.message));
-    }
-
+    // Theme Toggle
     function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+      const body = document.body;
+      const theme = body.dataset.theme === "dark" ? "light" : "dark";
+      body.dataset.theme = theme;
+      localStorage.setItem("theme", theme);
+      
+      // Update icon
+      const icon = document.querySelector('.theme-toggle i');
+      icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
     }
+
+    // Load saved theme
     if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
+      document.body.dataset.theme = "dark";
+      document.querySelector('.theme-toggle i').className = "fas fa-sun";
+    }
+
+    // Signup function with improved error handling
+    async function signup(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const submitBtn = document.getElementById("submitBtn");
+      const loading = document.getElementById("loading");
+      
+      // Reset error messages
+      document.getElementById("emailError").style.display = "none";
+      document.getElementById("passwordError").style.display = "none";
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      loading.style.display = "flex";
+      
+      try {
+        // Create user
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const uid = userCredential.user.uid;
+        
+        // Add to pending approvals
+        await db.ref("pending_users/" + uid).set({ 
+          email: email,
+          approved: false,
+          created_at: Date.now() 
+        });
+        
+        // Success - redirect to login with message
+        sessionStorage.setItem("signupSuccess", "true");
+        window.location.href = "login.html";
+        
+      } catch (error) {
+        // Handle errors
+        console.error("Signup error:", error);
+        
+        // Hide loading
+        submitBtn.disabled = false;
+        loading.style.display = "none";
+        
+        // Show appropriate error message
+        const errorMessage = getFriendlyErrorMessage(error.code);
+        if (error.code.includes("email")) {
+          document.getElementById("emailError").textContent = errorMessage;
+          document.getElementById("emailError").style.display = "block";
+        } else if (error.code.includes("password")) {
+          document.getElementById("passwordError").textContent = errorMessage;
+          document.getElementById("passwordError").style.display = "block";
+        } else {
+          alert(errorMessage);
+        }
+      }
+    }
+
+    // Convert Firebase error codes to friendly messages
+    function getFriendlyErrorMessage(code) {
+      switch(code) {
+        case "auth/email-already-in-use":
+          return "This email is already registered";
+        case "auth/invalid-email":
+          return "Please enter a valid email address";
+        case "auth/weak-password":
+          return "Password should be at least 6 characters";
+        case "auth/operation-not-allowed":
+          return "Email/password accounts are not enabled";
+        default:
+          return "An error occurred. Please try again";
+      }
     }
   </script>
 </body>
