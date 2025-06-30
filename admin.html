@@ -89,7 +89,7 @@
     auth.onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
 
-      const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // 🔐 Add your UID here
+      const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"]; // ✅ Your UID here
       if (!adminUIDs.includes(user.uid)) {
         alert("Access denied — Admins only.");
         auth.signOut();
@@ -120,8 +120,27 @@
     });
 
     function approve(uid) {
-      db.ref("pending_users/" + uid + "/approved").set(true);
-      alert("User approved.");
+      db.ref("pending_users/" + uid).once("value").then((snap) => {
+        const userData = snap.val();
+        if (!userData) {
+          alert("❌ User not found.");
+          return;
+        }
+
+        const updates = {};
+        updates["pending_users/" + uid + "/approved"] = true;
+        updates["admins/" + uid] = {
+          approved: true,
+          email: userData.email || "unknown",
+          role: "admin"
+        };
+
+        db.ref().update(updates).then(() => {
+          alert("✅ User approved and added to admins.");
+        }).catch((err) => {
+          alert("❌ Error: " + err.message);
+        });
+      });
     }
 
     function logout() {
