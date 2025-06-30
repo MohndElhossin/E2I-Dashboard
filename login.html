@@ -283,8 +283,8 @@
         // Check if user is approved
         const userSnapshot = await db.ref(`users/${uid}`).once('value');
         const adminSnapshot = await db.ref(`admins/${uid}`).once('value');
-        console.log(adminSnapshot);
-        if (!userSnapshot.exists() || !userSnapshot.val().approved || !adminSnapshot.exists()) {
+        console.log(adminSnapshot.val());
+        if (!userSnapshot.exists() || !userSnapshot.val().approved || adminSnapshot.val()) {
           await auth.signOut();
           throw new Error("Your account is pending approval");
         }
