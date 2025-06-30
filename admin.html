@@ -349,20 +349,20 @@
       userData.email, 
       userData.password
     );
-    const uid = userCredential.user.uid;
+    const uid = userData.email.replace(/\./g, '_').replace(/@/g, '_');
 
     // Update database records
     const updates = {
-      [`pending_users/${pendingId}/approved`]: true,
-      [`pending_users/${pendingId}/approved_by`]: adminUser.uid,
-      [`pending_users/${pendingId}/approved_at`]: Date.now(),
+      [`pending_users/${uid}/approved`]: true,
+      [`pending_users/${uid}/approved_by`]: adminUser.uid,
+      [`pending_users/${uid}/approved_at`]: Date.now(),
       [`users/${uid}`]: {
         email: userData.email,
         approved: true,
         created_at: userData.created_at
       },
       // Remove password
-      [`pending_users/${pendingId}/password`]: null
+      [`pending_users/${uid}/password`]: null
     };
 
     await db.ref().update(updates);

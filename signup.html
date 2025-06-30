@@ -277,12 +277,14 @@
   
   try {
     // Store in pending_users without creating auth account
-    const newPendingRef = db.ref("pending_users").push();
-    await newPendingRef.set({
-      email: email,
-      password: password, // Note: In production, consider more secure approaches
-      approved: false,
-      created_at: Date.now()
+    const sanitizedEmail = email.replace(/\./g, '_').replace(/@/g, '_');
+
+// Save under pending_users/sanitizedEmail
+await db.ref("pending_users/" + sanitizedEmail).set({
+  email: email,
+  password: password,  // For dev/demo only, never store raw password in real apps
+  approved: false,
+  created_at: Date.now()
     });
 
     // Show success message
