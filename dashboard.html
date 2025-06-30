@@ -384,9 +384,7 @@
         return;
       }
       db.ref("sessions/" + user.uid).once("value").then(sessionSnapshot => {
-        if (!sessionSnapshot.exists() ||
-          !localSession ||
-          localSession.uid !== user.uid) {
+        if (!sessionSnapshot.exists()) {
           clearSession();
           window.location.href = "login.html";
           return;
