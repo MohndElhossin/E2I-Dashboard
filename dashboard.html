@@ -266,6 +266,8 @@
   <!-- Your Firebase Config -->
   <script src="firebaseConfig.js"></script>
   <script>
+     let allDevices = {};
+    let currentDevices = {};
     const auth = firebase.auth();
     const db = firebase.database();
 
@@ -334,7 +336,8 @@
       db.ref("devices").on("value", 
         (snap) => {
           const data = snap.val() || {};
-          
+          allDevices = snap.val() || {};
+          currentDevices = {...allDevices};
           if (Object.keys(data).length === 0) {
             container.innerHTML = `
               <div class="empty-state">
