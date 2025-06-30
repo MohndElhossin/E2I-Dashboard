@@ -282,7 +282,8 @@
 
         // Check if user is approved
         const userSnapshot = await db.ref(`users/${uid}`).once('value');
-        if (!userSnapshot.exists() || !userSnapshot.val().approved) {
+        const adminSnapshot = await db.ref(`admins/${uid}`).once('value');
+        if (!userSnapshot.exists() || !userSnapshot.val().approved || !adminSnapshot.exists()) {
           await auth.signOut();
           throw new Error("Your account is pending approval");
         }
@@ -326,20 +327,7 @@
       }
       localStorage.removeItem('session');
     }
-    // Check if user is approved (modify according to your auth flow)
-    async function isUserApproved(uid) {
-      try {
-        const snapshot = await db.ref(`pending_users/${uid}`).once('value');
-        const userData = snapshot.val();
-
-        // Return true if no approval system or user is approved
-        return !userData || userData.approved !== false;
-      } catch (error) {
-        console.error("Approval check failed:", error);
-        return true; // Default to true if check fails
-      }
-    }
-
+    
     // Convert Firebase error codes to friendly messages
     function getFriendlyErrorMessage(code) {
       switch (code) {
