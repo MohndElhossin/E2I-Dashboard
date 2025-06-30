@@ -283,31 +283,45 @@
     }
 
     function filterDevices() {
-  const searchTerm = document.getElementById('searchInput').value;
-  console.log("Searching for:", searchTerm); // Debug log
-  
-  if (!searchTerm) {
-    // If search is empty, show all devices
-    currentDevices = {...allDevices};
-    renderDevices();
-    return;
-  }
-
-  // Filter devices based on search term
-  currentDevices = Object.entries(allDevices).reduce((filtered, [id, device]) => {
-    // Check if any device property contains the search term
-    const matches = Object.values(device).some(value => 
-      String(value).toLowerCase().includes(searchTerm)
-    );
+  try {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) throw new Error("Search input element not found");
     
-    if (matches) {
-      filtered[id] = device;
-    }
-    return filtered;
-  }, {});
+    const searchTerm = searchInput.value.toLowerCase();
+    console.log("[DEBUG] Search term:", searchTerm);
+    console.log("[DEBUG] Device count before filter:", Object.keys(allDevices).length);
 
-  // Update the display
-  renderDevices();
+    if (!searchTerm) {
+      currentDevices = {...allDevices};
+      renderDevices();
+      return;
+    }
+
+    currentDevices = Object.entries(allDevices).reduce((result, [id, device]) => {
+      console.log(`[DEBUG] Checking device ${id}`, device);
+      
+      const matches = Object.entries(device).some(([key, value]) => {
+        const strValue = String(value).toLowerCase();
+        const found = strValue.includes(searchTerm);
+        if (found) console.log(`Match found in ${key}: ${value}`);
+        return found;
+      });
+
+      if (matches) result[id] = device;
+      return result;
+    }, {});
+
+    console.log("[DEBUG] Filtered device count:", Object.keys(currentDevices).length);
+    renderDevices();
+    
+  } catch (error) {
+    console.error("Error in filterDevices:", error);
+    document.getElementById("devices").innerHTML = `
+      <div class="error">
+        Search failed: ${error.message}
+      </div>
+    `;
+  }
 }
     function renderDevices() {
       const container = document.getElementById("devices");
