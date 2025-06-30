@@ -225,7 +225,7 @@
   <script>
     const auth = firebase.auth();
     const db = firebase.database();
-
+    let Operation ="idle";
     // Theme Toggle
     function toggleTheme() {
       const body = document.body;
@@ -253,7 +253,7 @@
 
       // Check admin status (now using database instead of hardcoded UIDs)
       checkAdminStatus(user.uid).then(isAdmin => {
-        if (!isAdmin) {
+        if (!isAdmin && Operation === "idle") {
           showError("Access denied — Admins only.");
           auth.signOut().then(() => {
             window.location.href = "login.html";
@@ -345,14 +345,14 @@
 
     // Store admin email for reauthentication
     const adminEmail = adminUser.email;
-    
+    Operation="admin";
     // Create the auth account
     const userCredential = await auth.createUserWithEmailAndPassword(
       userData.email, 
       userData.password
     );
     const uid = userCredential.user.uid; // Use Firebase-generated UID
-    
+
     // Sign back in as admin (using stored email)
     await auth.signInWithEmailAndPassword(adminEmail, prompt("Confirm your admin password"));
 
@@ -372,9 +372,10 @@
     await db.ref().update(updates);
     alert(`Approved user: ${userData.email}`);
     loadPendingUsers();
-
+    Operation="idle";
   } catch (error) {
     console.error("Approval failed:", error);
+    Operation="idle";
     alert("Approval failed: " + error.message);
     
     // Try to restore admin session if something went wrong
