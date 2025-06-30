@@ -187,6 +187,43 @@
         grid-template-columns: 1fr;
       }
     }
+     .search-container {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
+      padding-left: 45px;
+      border-radius: 25px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary);
+      border-color: transparent;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+      grid-column: 1 / -1;
+    }
   </style>
 </head>
 <body data-theme="light">
@@ -205,6 +242,17 @@
       </div>
     </header>
 
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        id="searchInput" 
+        placeholder="Search devices by SN, HW, SW, customer..." 
+        oninput="filterDevices()"
+      >
+    </div>
+
     <div id="devices">
       <div class="loading">
         <div class="spinner"></div>
@@ -217,7 +265,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
-  <!-- Your Firebase Config -->
+  <!--Firebase Config -->
   <script src="firebaseConfig.js"></script>
   <script>
     const auth = firebase.auth();
@@ -251,7 +299,14 @@
         loadDashboard();
       });
     });
-
+    function filterDevices() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      if (!searchTerm) {
+        currentDevices = {...allDevices};
+        renderDevices();
+        return;
+      }
     function loadDashboard() {
       const container = document.getElementById("devices");
       
