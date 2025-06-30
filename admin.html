@@ -332,6 +332,8 @@
   if (!adminUser) return;
 
   try {
+    const adminEmail = adminUser.email;
+    const adminPassword = prompt("Confirm your admin password");
     // Verify admin status
     const adminSnapshot = await db.ref(`admins/${adminUser.uid}`).once('value');
     if (!adminSnapshot.exists()) {
@@ -349,6 +351,10 @@
       userData.email, 
       userData.password
     );
+     await auth.signOut();
+    
+    // Sign back in as admin
+    await auth.signInWithEmailAndPassword(adminEmail, adminPassword);
     const uid = userData.email.replace(/\./g, '_').replace(/@/g, '_');
 
     // Update database records
