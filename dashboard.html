@@ -1,191 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Device Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Previous head content remains the same -->
   <style>
-    :root {
-      --bg: #f8f9fa;
-      --text: #2c3e50;
-      --card: #ffffff;
-      --primary: #4361ee;
-      --success: #2ecc71;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --border: #e0e0e0;
+    /* Add these new styles to your existing CSS */
+    .search-container {
+      margin-bottom: 25px;
+      position: relative;
     }
-
-    [data-theme="dark"] {
-      --bg: #121212;
-      --text: #f5f5f5;
-      --card: #1e1e1e;
-      --border: #333333;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      transition: all 0.3s ease;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    h1 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 28px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .theme-toggle {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    .devices-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .device-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      transition: transform 0.3s, box-shadow 0.3s;
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
+      padding-left: 45px;
+      border-radius: 25px;
       border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      transition: all 0.3s;
     }
-
-    .device-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    .search-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary);
+      border-color: transparent;
     }
-
-    .device-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .device-title {
-      font-weight: 600;
-      font-size: 18px;
-      margin: 0;
-    }
-
-    .device-status {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--success);
-    }
-
-    .device-detail {
-      display: flex;
-      margin-bottom: 8px;
-    }
-
-    .detail-label {
-      font-weight: 500;
-      width: 100px;
+    
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
       color: #7f8c8d;
     }
-
-    .detail-value {
-      flex: 1;
-    }
-
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top-color: var(--primary);
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .empty-state {
+    
+    .no-results {
       text-align: center;
       padding: 40px;
       color: #7f8c8d;
-    }
-
-    .empty-state i {
-      font-size: 50px;
-      margin-bottom: 20px;
-      color: #bdc3c7;
-    }
-
-    @media (max-width: 768px) {
-      .devices-grid {
-        grid-template-columns: 1fr;
-      }
+      grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -205,6 +59,18 @@
       </div>
     </header>
 
+    <!-- Add this search container -->
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        id="searchInput" 
+        placeholder="Search devices by SN, HW, SW, customer..." 
+        oninput="filterDevices()"
+      >
+    </div>
+
     <div id="devices">
       <div class="loading">
         <div class="spinner"></div>
@@ -212,50 +78,16 @@
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  
-  <!-- Your Firebase Config -->
-  <script src="firebaseConfig.js"></script>
+  <!-- Previous script tags remain the same -->
+
   <script>
-    const auth = firebase.auth();
-    const db = firebase.database();
+    // Add these variables at the top of your script
+    let allDevices = {};
+    let currentDevices = {};
 
-    // Theme Toggle
-    function toggleTheme() {
-      const body = document.body;
-      const theme = body.dataset.theme === "dark" ? "light" : "dark";
-      body.dataset.theme = theme;
-      
-      // Update icon
-      const icon = document.querySelector('.theme-toggle i');
-      icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
-    }
-
-    // Go to admin page
-    function goToAdminPage() {
-      window.location.href = "admin.html";
-    }
-
-    // Auth check
-    auth.onAuthStateChanged(user => {
-      if (!user) return location.href = "login.html";
-
-      // Check if user is admin
-      db.ref("admins/" + user.uid).once("value").then(snap => {
-        if (snap.exists()) {
-          document.getElementById("admin-btn-container").style.display = "block";
-        }
-        loadDashboard();
-      });
-    });
-
+    // Modify your loadDashboard function to store devices
     function loadDashboard() {
       const container = document.getElementById("devices");
-      
-      // Show loading state
       container.innerHTML = `
         <div class="loading">
           <div class="spinner"></div>
@@ -264,52 +96,98 @@
 
       db.ref("devices").on("value", 
         (snap) => {
-          const data = snap.val() || {};
-          
-          if (Object.keys(data).length === 0) {
-            container.innerHTML = `
-              <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <h3>No Devices Found</h3>
-                <p>There are currently no devices registered in the system.</p>
-              </div>
-            `;
-            return;
-          }
-
-          // Create device cards
-          container.innerHTML = '<div class="devices-grid"></div>';
-          const grid = container.querySelector('.devices-grid');
-          
-          Object.entries(data).forEach(([id, dev]) => {
-            const card = document.createElement("div");
-            card.className = "device-card";
-            card.innerHTML = `
-              <div class="device-header">
-                <h3 class="device-title">${dev.sn || "Unknown Device"}</h3>
-                <div class="device-status"></div>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Hardware:</span>
-                <span class="detail-value">${dev.hw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Software:</span>
-                <span class="detail-value">${dev.sw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Customer:</span>
-                <span class="detail-value">${dev.customer || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Last Seen:</span>
-                <span class="detail-value">${dev.last_seen || "Unknown"}</span>
-              </div>
-            `;
-            grid.appendChild(card);
-          });
+          allDevices = snap.val() || {};
+          currentDevices = {...allDevices};
+          renderDevices();
         }, 
         (error) => {
+          console.error("Failed to load devices:", error);
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>Failed to Load Devices</h3>
+              <p>${error.message || 'Please try again later.'}</p>
+              <button class="btn btn-primary" onclick="loadDashboard()">
+                <i class="fas fa-sync-alt"></i> Retry
+              </button>
+            </div>
+          `;
+        }
+      );
+    }
+
+    // Add this new function to filter devices
+    function filterDevices() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      if (!searchTerm) {
+        currentDevices = {...allDevices};
+        renderDevices();
+        return;
+      }
+
+      currentDevices = Object.entries(allDevices).reduce((acc, [id, device]) => {
+        // Search across all device properties
+        const matches = Object.values(device).some(value => 
+          String(value).toLowerCase().includes(searchTerm)
+        );
+        
+        if (matches) {
+          acc[id] = device;
+        }
+        return acc;
+      }, {});
+
+      renderDevices();
+    }
+
+    // Add this new function to render filtered devices
+    function renderDevices() {
+      const container = document.getElementById("devices");
+      
+      if (Object.keys(currentDevices).length === 0) {
+        container.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search" style="font-size: 50px; margin-bottom: 15px;"></i>
+            <h3>No Matching Devices Found</h3>
+            <p>Try adjusting your search query</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '<div class="devices-grid"></div>';
+      const grid = container.querySelector('.devices-grid');
+      
+      Object.entries(currentDevices).forEach(([id, dev]) => {
+        const card = document.createElement("div");
+        card.className = "device-card";
+        card.innerHTML = `
+          <div class="device-header">
+            <h3 class="device-title">${dev.sn || "Unknown Device"}</h3>
+            <div class="device-status"></div>
+          </div>
+          <div class="device-detail">
+            <span class="detail-label">Hardware:</span>
+            <span class="detail-value">${dev.hw_version || "N/A"}</span>
+          </div>
+          <div class="device-detail">
+            <span class="detail-label">Software:</span>
+            <span class="detail-value">${dev.sw_version || "N/A"}</span>
+          </div>
+          <div class="device-detail">
+            <span class="detail-label">Customer:</span>
+            <span class="detail-value">${dev.customer || "N/A"}</span>
+          </div>
+          <div class="device-detail">
+            <span class="detail-label">Last Seen:</span>
+            <span class="detail-value">${dev.last_seen || "Unknown"}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    },
+    (error) => {
           console.error("Failed to load devices:", error);
           container.innerHTML = `
             <div class="empty-state">
