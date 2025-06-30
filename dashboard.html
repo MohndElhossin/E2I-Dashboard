@@ -68,13 +68,15 @@
 
   <!-- 🔐 Your Firebase Config -->
   <script src="firebaseConfig.js"></script>
-
-  <script>
-    import {
+<script type="module">
+   import {
     getDatabase,
     ref,
     onValue
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+</script>
+  <script>
+   
     const auth = firebase.auth();
     const db = firebase.database();
 
