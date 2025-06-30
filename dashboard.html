@@ -119,26 +119,19 @@
   function loadDashboard() {
   const container = document.getElementById("devices");
 
-  const devicesRef = ref(db, "devices");
-    onValue(devicesRef, (snapshot) => {
-      const devices = snapshot.val() || {};
-    container.innerHTML = ""; // Clear old content
-    console.log(devices);
-    Object.entries(devices).forEach(([id, dev]) => {
-      if (!dev || typeof dev !== "object" || !dev.sn) return;
-
-      // Filter out sensitive or irrelevant keys
-      const { sn, hw_version, sw_version, customer } = dev;
-
-      container.innerHTML += `
-        <div class="device-card">
-          <b>SN:</b> ${sn || "N/A"}<br>
-          <b>HW:</b> ${hw_version || "N/A"}<br>
-          <b>SW:</b> ${sw_version || "N/A"}<br>
-          <b>Customer:</b> ${customer || "N/A"}
-        </div>
-      `;
-    });
+  db.ref("devices").on("value", snap => {
+  const data = snap.val() || {};
+  container.innerHTML = "";
+  Object.entries(data).forEach(([id, dev]) => {
+    container.innerHTML += `
+      <div class="device-card">
+        <b>SN:</b> ${dev.sn || "N/A"}<br>
+        <b>HW:</b> ${dev.hw_version || "N/A"}<br>
+        <b>SW:</b> ${dev.sw_version || "N/A"}<br>
+        <b>Customer:</b> ${dev.customer || "N/A"}
+      </div>
+    `;
+  });
   }, (error) => {
     console.error("Failed to load devices:", error);
     container.innerHTML = "<p style='color:red;'>Failed to load devices.</p>";
