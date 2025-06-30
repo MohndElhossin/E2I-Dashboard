@@ -182,6 +182,14 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+     .waiting-approval {
+      text-align: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+    }
   </style>
 </head>
 <body data-theme="light">
@@ -235,30 +243,17 @@
       </div>
     </div>
   </div>
+<div id="waitingApproval" class="waiting-approval">
+    <i class="fas fa-clock" style="font-size: 3em; color: #4361ee;"></i>
+    <h3>Waiting for Approval</h3>
+    <p>Your account is pending admin approval. You'll receive an email when your account is activated.</p>
+    <p><a href="login.html">Return to Login</a></p>
+  </div>
 
   <script>
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Theme Toggle
-    function toggleTheme() {
-      const body = document.body;
-      const theme = body.dataset.theme === "dark" ? "light" : "dark";
-      body.dataset.theme = theme;
-      localStorage.setItem("theme", theme);
-      
-      // Update icon
-      const icon = document.querySelector('.theme-toggle i');
-      icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
-    }
-
-    // Load saved theme
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.dataset.theme = "dark";
-      document.querySelector('.theme-toggle i').className = "fas fa-sun";
-    }
-
-    // Signup function with improved error handling
     async function signup(e) {
       e.preventDefault();
       
@@ -266,53 +261,41 @@
       const password = document.getElementById("password").value;
       const submitBtn = document.getElementById("submitBtn");
       const loading = document.getElementById("loading");
-      
-      // Reset error messages
-      document.getElementById("emailError").style.display = "none";
-      document.getElementById("passwordError").style.display = "none";
+      const form = document.querySelector('form');
+      const waitingDiv = document.getElementById("waitingApproval");
       
       // Show loading state
       submitBtn.disabled = true;
       loading.style.display = "flex";
       
       try {
-        // Create user
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const uid = userCredential.user.uid;
-        
-        // Add to pending approvals
-        await db.ref("pending_users/" + uid).set({ 
+        // Store in pending_users (without creating auth account)
+        const newPendingRef = db.ref("pending_users").push();
+        await newPendingRef.set({
           email: email,
+          password: password, // Note: In production, you should NEVER store raw passwords
           approved: false,
-          created_at: Date.now() 
+          created_at: Date.now()
         });
-        
-        // Success - redirect to login with message
-        sessionStorage.setItem("signupSuccess", "true");
-        window.location.href = "login.html";
+
+        // Hide form and show waiting message
+        form.style.display = "none";
+        waitingDiv.style.display = "block";
         
       } catch (error) {
-        // Handle errors
         console.error("Signup error:", error);
-        
-        // Hide loading
         submitBtn.disabled = false;
         loading.style.display = "none";
         
-        // Show appropriate error message
-        const errorMessage = getFriendlyErrorMessage(error.code);
-        if (error.code.includes("email")) {
-          document.getElementById("emailError").textContent = errorMessage;
-          document.getElementById("emailError").style.display = "block";
-        } else if (error.code.includes("password")) {
-          document.getElementById("passwordError").textContent = errorMessage;
-          document.getElementById("passwordError").style.display = "block";
-        } else {
-          alert(errorMessage);
+        let errorMessage = "Signup failed. Please try again.";
+        if (error.code === "PERMISSION_DENIED") {
+          errorMessage = "Signup is currently unavailable. Please try again later.";
         }
+        
+        document.getElementById("emailError").textContent = errorMessage;
+        document.getElementById("emailError").style.display = "block";
       }
     }
-
     // Convert Firebase error codes to friendly messages
     function getFriendlyErrorMessage(code) {
       switch(code) {
