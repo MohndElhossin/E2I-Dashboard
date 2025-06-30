@@ -283,14 +283,32 @@
     }
 
     function filterDevices() {
-      const searchTerm = document.getElementById('searchInput').value;
-      console.log(searchTerm);
-      if (!searchTerm) {
-        currentDevices = {...allDevices};
-        renderDevices();
-        return;
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  console.log("Searching for:", searchTerm); // Debug log
+  
+  if (!searchTerm) {
+    // If search is empty, show all devices
+    currentDevices = {...allDevices};
+    renderDevices();
+    return;
+  }
+
+  // Filter devices based on search term
+  currentDevices = Object.entries(allDevices).reduce((filtered, [id, device]) => {
+    // Check if any device property contains the search term
+    const matches = Object.values(device).some(value => 
+      String(value).toLowerCase().includes(searchTerm)
+    );
+    
+    if (matches) {
+      filtered[id] = device;
     }
-    }
+    return filtered;
+  }, {});
+
+  // Update the display
+  renderDevices();
+}
     function renderDevices() {
       const container = document.getElementById("devices");
       
