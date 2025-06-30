@@ -249,7 +249,22 @@
     <p>Your account is pending admin approval. You'll receive an email when your account is activated.</p>
     <p><a href="login.html">Return to Login</a></p>
   </div>
-
+<div id="formContainer">
+    <form id="signupForm" onsubmit="signup(event)">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit" id="submitBtn">Sign Up</button>
+    </form>
+  </div>
+  
+  <!-- Success message container with ID -->
+  <div id="successMessage" class="hidden">
+    <i class="fas fa-check-circle" style="color: green; font-size: 3em;"></i>
+    <h3>Registration Successful!</h3>
+    <p>Your account is pending admin approval.</p>
+    <p>You'll receive an email when your account is activated.</p>
+    <p><a href="login.html">Return to Login</a></p>
+  </div>
   <script>
     const auth = firebase.auth();
     const db = firebase.database();
