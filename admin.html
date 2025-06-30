@@ -353,9 +353,6 @@
     );
     const uid = userCredential.user.uid; // Use Firebase-generated UID
     
-    // Immediately sign out the new user
-    await auth.signOut();
-    
     // Sign back in as admin (using stored email)
     await auth.signInWithEmailAndPassword(adminEmail, prompt("Confirm your admin password"));
 
