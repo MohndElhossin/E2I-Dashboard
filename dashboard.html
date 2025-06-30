@@ -283,7 +283,7 @@
     }
 
     function filterDevices() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const searchTerm = document.getElementById('searchInput').value();
       
       if (!searchTerm) {
         currentDevices = {...allDevices};
