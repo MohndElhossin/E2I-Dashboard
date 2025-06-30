@@ -323,20 +323,54 @@
     `;
   }
 }
-    function renderDevices() {
-      const container = document.getElementById("devices");
-      
-      if (Object.keys(currentDevices).length === 0) {
-        container.innerHTML = `
-          <div class="no-results">
-            <i class="fas fa-search" style="font-size: 50px; margin-bottom: 15px;"></i>
-            <h3>No Matching Devices Found</h3>
-            <p>Try adjusting your search query</p>
-          </div>
-        `;
-        return;
-      }
-    }
+   function renderDevices() {
+  const container = document.getElementById("devices");
+  
+  // Handle empty state
+  if (!currentDevices || Object.keys(currentDevices).length === 0) {
+    container.innerHTML = `
+      <div class="no-results">
+        <i class="fas fa-search" style="font-size: 50px; margin-bottom: 15px;"></i>
+        <h3>No Matching Devices Found</h3>
+        <p>Try adjusting your search query</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Create devices grid
+  container.innerHTML = '<div class="devices-grid"></div>';
+  const grid = container.querySelector('.devices-grid');
+  
+  // Render each device card
+  Object.entries(currentDevices).forEach(([id, device]) => {
+    const card = document.createElement("div");
+    card.className = "device-card";
+    card.innerHTML = `
+      <div class="device-header">
+        <h3 class="device-title">${device.sn || "Unknown Device"}</h3>
+        <div class="device-status"></div>
+      </div>
+      <div class="device-detail">
+        <span class="detail-label">Hardware:</span>
+        <span class="detail-value">${device.hw_version || "N/A"}</span>
+      </div>
+      <div class="device-detail">
+        <span class="detail-label">Software:</span>
+        <span class="detail-value">${device.sw_version || "N/A"}</span>
+      </div>
+      <div class="device-detail">
+        <span class="detail-label">Customer:</span>
+        <span class="detail-value">${device.customer || "N/A"}</span>
+      </div>
+      <div class="device-detail">
+        <span class="detail-label">Last Seen:</span>
+        <span class="detail-value">${device.last_seen || "Unknown"}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
     // Go to admin page
     function goToAdminPage() {
       window.location.href = "admin.html";
