@@ -4,83 +4,234 @@
   <meta charset="UTF-8" />
   <title>Device Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f4f4;
-      --text: #222;
-      --card: #fff;
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --card: #ffffff;
+      --primary: #4361ee;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --border: #e0e0e0;
     }
 
     [data-theme="dark"] {
-      --bg: #1e1e1e;
-      --text: #eee;
-      --card: #2a2a2a;
+      --bg: #121212;
+      --text: #f5f5f5;
+      --card: #1e1e1e;
+      --border: #333333;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
     }
 
     h1 {
-      margin-bottom: 1rem;
+      margin: 0;
+      font-weight: 600;
+      font-size: 28px;
     }
 
-    .toggle-theme {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .devices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .device-card {
       background: var(--card);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid var(--border);
     }
 
-    button {
-      cursor: pointer;
+    .device-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .device-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .device-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .device-detail {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      width: 100px;
+      color: #7f8c8d;
+    }
+
+    .detail-value {
+      flex: 1;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+    }
+
+    .empty-state i {
+      font-size: 50px;
+      margin-bottom: 20px;
+      color: #bdc3c7;
+    }
+
+    @media (max-width: 768px) {
+      .devices-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body data-theme="light">
-  <button class="toggle-theme" onclick="toggleTheme()">🌗</button>
-  <h1>Device Dashboard</h1>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-tablet-alt"></i> Device Dashboard</h1>
+      <div class="header-actions">
+        <div id="admin-btn-container" style="display:none;">
+          <button class="btn btn-primary" onclick="goToAdminPage()">
+            <i class="fas fa-lock"></i> Admin Panel
+          </button>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </header>
 
-  <!-- Admin Panel Button (hidden by default) -->
-  <div id="admin-btn-container" style="display:none; margin-bottom: 1rem;">
-    <button onclick="goToAdminPage()" style="padding: 8px 16px; border-radius: 6px; background: #444; color: white; border: none;">
-      🔐 Admin Panel
-    </button>
+    <div id="devices">
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
   </div>
-
-  <div id="devices"></div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
-
-  <!-- 🔐 Your Firebase Config -->
+  <!-- Your Firebase Config -->
   <script src="firebaseConfig.js"></script>
   <script>
-   
     const auth = firebase.auth();
     const db = firebase.database();
-
-    // ✅ Replace with your admin UID(s)
-    const adminUIDs = ["7botBVXsujaFpEJPnzAMXLJlxp42"];
 
     // Theme Toggle
     function toggleTheme() {
       const body = document.body;
-      body.dataset.theme = body.dataset.theme === "dark" ? "light" : "dark";
+      const theme = body.dataset.theme === "dark" ? "light" : "dark";
+      body.dataset.theme = theme;
+      
+      // Update icon
+      const icon = document.querySelector('.theme-toggle i');
+      icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
     }
 
     // Go to admin page
@@ -92,67 +243,87 @@
     auth.onAuthStateChanged(user => {
       if (!user) return location.href = "login.html";
 
-      const uid = user.uid;
-      console.log("Logged in:", uid);
-
-      if (adminUIDs.includes(uid)) {
-        document.getElementById("admin-btn-container").style.display = "block";
-        loadDashboard();
-        return;
-      }
-
-      // Non-admins: Check if approved
-      db.ref("pending_users/" + uid).get().then(snap => {
-        const data = snap.val();
-        if (!snap.exists() || !data || !data.approved) {
-          alert("You are not approved yet.");
-          auth.signOut().then(() => location.href = "login.html");
-        } else {
-          loadDashboard();
+      // Check if user is admin
+      db.ref("admins/" + user.uid).once("value").then(snap => {
+        if (snap.exists()) {
+          document.getElementById("admin-btn-container").style.display = "block";
         }
-      }).catch(err => {
-        alert("Error checking approval: " + err.message);
-        auth.signOut().then(() => location.href = "login.html");
+        loadDashboard();
       });
     });
 
-  function loadDashboard() {
-   const container = document.getElementById("devices");
-  container.innerHTML = "<p>Loading devices...</p>";
-
-  db.ref("devices").on("value", 
-    (snap) => {
-      const data = snap.val() || {};
-      if (Object.keys(data).length === 0) {
-        container.innerHTML = "<p>No devices found</p>";
-        return;
-      }
-
-      // Use DOM methods instead of innerHTML +=
-      container.innerHTML = "";
-      Object.entries(data).forEach(([id, dev]) => {
-        const card = document.createElement("div");
-        card.className = "device-card";
-        card.innerHTML = `
-          <b>SN:</b> ${dev.sn || "N/A"}<br>
-          <b>HW:</b> ${dev.hw_version || "N/A"}<br>
-          <b>SW:</b> ${dev.sw_version || "N/A"}<br>
-          <b>Customer:</b> ${dev.customer || "N/A"}
-        `;
-        container.appendChild(card);
-      });
-    }, 
-    (error) => {
-      console.error("Failed to load devices:", error);
+    function loadDashboard() {
+      const container = document.getElementById("devices");
+      
+      // Show loading state
       container.innerHTML = `
-        <p style='color:red;'>
-          Failed to load devices. ${error.message}
-          <button onclick="loadDashboard()">Retry</button>
-        </p>
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
       `;
+
+      db.ref("devices").on("value", 
+        (snap) => {
+          const data = snap.val() || {};
+          
+          if (Object.keys(data).length === 0) {
+            container.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No Devices Found</h3>
+                <p>There are currently no devices registered in the system.</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Create device cards
+          container.innerHTML = '<div class="devices-grid"></div>';
+          const grid = container.querySelector('.devices-grid');
+          
+          Object.entries(data).forEach(([id, dev]) => {
+            const card = document.createElement("div");
+            card.className = "device-card";
+            card.innerHTML = `
+              <div class="device-header">
+                <h3 class="device-title">${dev.sn || "Unknown Device"}</h3>
+                <div class="device-status"></div>
+              </div>
+              <div class="device-detail">
+                <span class="detail-label">Hardware:</span>
+                <span class="detail-value">${dev.hw_version || "N/A"}</span>
+              </div>
+              <div class="device-detail">
+                <span class="detail-label">Software:</span>
+                <span class="detail-value">${dev.sw_version || "N/A"}</span>
+              </div>
+              <div class="device-detail">
+                <span class="detail-label">Customer:</span>
+                <span class="detail-value">${dev.customer || "N/A"}</span>
+              </div>
+              <div class="device-detail">
+                <span class="detail-label">Last Seen:</span>
+                <span class="detail-value">${dev.last_seen || "Unknown"}</span>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        }, 
+        (error) => {
+          console.error("Failed to load devices:", error);
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>Failed to Load Devices</h3>
+              <p>${error.message || 'Please try again later.'}</p>
+              <button class="btn btn-primary" onclick="loadDashboard()">
+                <i class="fas fa-sync-alt"></i> Retry
+              </button>
+            </div>
+          `;
+        }
+      );
     }
-  );
-}
   </script>
 </body>
 </html>
