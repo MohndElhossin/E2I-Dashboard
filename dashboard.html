@@ -379,14 +379,14 @@
     // Auth check
     auth.onAuthStateChanged(user => {
     if (!user) {
-      await clearSession();
+       clearSession();
       window.location.href = "login.html";
     return;
   }
   if (!sessionSnapshot.exists() || 
       !localSession || 
       localSession.uid !== user.uid) {
-    await clearSession();
+     clearSession();
     window.location.href = "login.html";
     return;
   }
