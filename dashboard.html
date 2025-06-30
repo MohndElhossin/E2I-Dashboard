@@ -289,6 +289,20 @@
         return;
     }
     }
+    function renderDevices() {
+      const container = document.getElementById("devices");
+      
+      if (Object.keys(currentDevices).length === 0) {
+        container.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search" style="font-size: 50px; margin-bottom: 15px;"></i>
+            <h3>No Matching Devices Found</h3>
+            <p>Try adjusting your search query</p>
+          </div>
+        `;
+        return;
+      }
+    }
     // Go to admin page
     function goToAdminPage() {
       window.location.href = "admin.html";
