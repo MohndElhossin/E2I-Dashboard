@@ -378,14 +378,27 @@
 
     // Auth check
     auth.onAuthStateChanged(user => {
-      if (!user) return location.href = "login.html";
-
+    if (!user) {
+      await clearSession();
+      window.location.href = "login.html";
+    return;
+  }
+  if (!sessionSnapshot.exists() || 
+      !localSession || 
+      localSession.uid !== user.uid) {
+    await clearSession();
+    window.location.href = "login.html";
+    return;
+  }
       // Check if user is admin
       db.ref("admins/" + user.uid).once("value").then(snap => {
         if (snap.exists()) {
           document.getElementById("admin-btn-container").style.display = "block";
         }
         loadDashboard();
+        setInterval(() => {
+    db.ref(`sessions/${user.uid}/lastActive`).set(Date.now());
+  }, 5 * 60 * 1000);
       });
     });
 
@@ -462,6 +475,16 @@
         }
       );
     }
+    // Logout function
+async function logout() {
+  const user = auth.currentUser;
+  if (user) {
+    await db.ref(`sessions/${user.uid}`).remove();
+  }
+  localStorage.removeItem('session');
+  await auth.signOut();
+  window.location.href = "login.html";
+}
   </script>
 </body>
 </html>

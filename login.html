@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -13,7 +14,7 @@
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -181,7 +182,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .success-message {
@@ -192,6 +195,7 @@
     }
   </style>
 </head>
+
 <body data-theme="light">
   <button class="theme-toggle" onclick="toggleTheme()">
     <i class="fas fa-moon"></i>
@@ -212,25 +216,13 @@
       <form onsubmit="login(event)">
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            class="form-control" 
-            placeholder="Enter your email" 
-            required
-          >
+          <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
           <div id="emailError" class="error-message"></div>
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            class="form-control" 
-            placeholder="Enter your password" 
-            required
-          >
+          <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
           <div id="passwordError" class="error-message"></div>
         </div>
 
@@ -243,7 +235,7 @@
       </form>
 
       <div class="auth-footer">
-        <a href="signup.html">Create account</a> • 
+        <a href="signup.html">Create account</a> •
         <a href="#" onclick="forgotPassword()">Forgot password?</a> •
         <a href="admin.html">Admin login</a>
       </div>
@@ -260,7 +252,7 @@
       const theme = body.dataset.theme === "dark" ? "light" : "dark";
       body.dataset.theme = theme;
       localStorage.setItem("theme", theme);
-      
+
       // Update icon
       const icon = document.querySelector('.theme-toggle i');
       icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
@@ -278,64 +270,68 @@
       sessionStorage.removeItem("signupSuccess");
     }
 
-    // Login function with improved error handling
     async function login(e) {
       e.preventDefault();
-      
-      const email = document.getElementById("email").value.trim();
+
+      const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const submitBtn = document.getElementById("submitBtn");
-      const loading = document.getElementById("loading");
-      
-      // Reset error messages
-      document.getElementById("emailError").style.display = "none";
-      document.getElementById("passwordError").style.display = "none";
-      
-      // Show loading state
-      submitBtn.disabled = true;
-      loading.style.display = "flex";
-      
+
       try {
-        // Sign in user
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        
-        // Check if user is approved (if using approval system)
-        if (await isUserApproved(user.uid)) {
-          window.location.href = "dashboard.html";
-        } else {
+        const uid = userCredential.user.uid;
+
+        // Check if user is approved
+        const userSnapshot = await db.ref(`users/${uid}`).once('value');
+        if (!userSnapshot.exists() || !userSnapshot.val().approved) {
           await auth.signOut();
-          throw new Error("Your account is pending approval. Please try again later.");
+          throw new Error("Your account is pending approval");
         }
-        
+
+        // Create session timestamp
+        const sessionData = {
+          active: true,
+          lastActive: Date.now(),
+          ip: await getClientIP() // Optional
+        };
+
+        // Store session in database and localStorage
+        await db.ref(`sessions/${uid}`).set(sessionData);
+        localStorage.setItem('session', JSON.stringify({
+          uid: uid,
+          created: Date.now()
+        }));
+
+        window.location.href = "dashboard.html";
+
       } catch (error) {
-        // Handle errors
         console.error("Login error:", error);
-        
-        // Hide loading
-        submitBtn.disabled = false;
-        loading.style.display = "none";
-        
-        // Show appropriate error message
-        const errorMessage = getFriendlyErrorMessage(error.code);
-        if (error.code?.includes("email") || error.message.includes("email")) {
-          document.getElementById("emailError").textContent = error.message || errorMessage;
-          document.getElementById("emailError").style.display = "block";
-        } else if (error.code?.includes("password") || error.message.includes("password")) {
-          document.getElementById("passwordError").textContent = error.message || errorMessage;
-          document.getElementById("passwordError").style.display = "block";
-        } else {
-          alert(error.message || errorMessage);
-        }
+        alert(error.message);
       }
     }
 
+    // Check for existing session on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('session')) {
+        // Clear any existing session when returning to login
+        clearSession();
+        auth.signOut();
+      }
+    });
+
+    // Helper function to clear session
+    async function clearSession() {
+      const session = JSON.parse(localStorage.getItem('session'));
+      if (session?.uid) {
+        await db.ref(`sessions/${session.uid}`).remove();
+      }
+      localStorage.removeItem('session');
+    }
     // Check if user is approved (modify according to your auth flow)
     async function isUserApproved(uid) {
       try {
         const snapshot = await db.ref(`pending_users/${uid}`).once('value');
         const userData = snapshot.val();
-        
+
         // Return true if no approval system or user is approved
         return !userData || userData.approved !== false;
       } catch (error) {
@@ -346,7 +342,7 @@
 
     // Convert Firebase error codes to friendly messages
     function getFriendlyErrorMessage(code) {
-      switch(code) {
+      switch (code) {
         case "auth/user-not-found":
           return "No account found with this email";
         case "auth/wrong-password":
@@ -364,9 +360,9 @@
     async function forgotPassword() {
       const email = document.getElementById("email").value.trim();
       const emailInput = email || prompt("Please enter your email address:");
-      
+
       if (!emailInput) return;
-      
+
       try {
         await auth.sendPasswordResetEmail(emailInput);
         alert(`Password reset email sent to ${emailInput}. Check your inbox.`);
@@ -376,4 +372,5 @@
     }
   </script>
 </body>
+
 </html>
