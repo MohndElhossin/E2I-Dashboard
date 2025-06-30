@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Device Dashboard</title>
@@ -167,7 +168,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .empty-state {
@@ -187,11 +190,12 @@
         grid-template-columns: 1fr;
       }
     }
-      .search-container {
+
+    .search-container {
       margin-bottom: 25px;
       position: relative;
     }
-    
+
     .search-input {
       width: 100%;
       padding: 12px 20px;
@@ -203,13 +207,13 @@
       font-size: 16px;
       transition: all 0.3s;
     }
-    
+
     .search-input:focus {
       outline: none;
       box-shadow: 0 0 0 2px var(--primary);
       border-color: transparent;
     }
-    
+
     .search-icon {
       position: absolute;
       left: 15px;
@@ -217,7 +221,7 @@
       transform: translateY(-50%);
       color: #7f8c8d;
     }
-    
+
     .no-results {
       text-align: center;
       padding: 40px;
@@ -226,6 +230,7 @@
     }
   </style>
 </head>
+
 <body data-theme="light">
   <div class="container">
     <header>
@@ -241,15 +246,10 @@
         </button>
       </div>
     </header>
-<div class="search-container">
+    <div class="search-container">
       <i class="fas fa-search search-icon"></i>
-      <input 
-        type="text" 
-        class="search-input" 
-        id="searchInput" 
-        placeholder="Search devices by SN, HW, SW, customer..." 
-        oninput="filterDevices()"
-      >
+      <input type="text" class="search-input" id="searchInput" placeholder="Search devices by SN, HW, SW, customer..."
+        oninput="filterDevices()">
     </div>
     <div id="devices">
       <div class="loading">
@@ -262,11 +262,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  
+
   <!-- Your Firebase Config -->
   <script src="firebaseConfig.js"></script>
   <script>
-     let allDevices = {};
+    let allDevices = {};
     let currentDevices = {};
     const auth = firebase.auth();
     const db = firebase.database();
@@ -276,77 +276,77 @@
       const body = document.body;
       const theme = body.dataset.theme === "dark" ? "light" : "dark";
       body.dataset.theme = theme;
-      
+
       // Update icon
       const icon = document.querySelector('.theme-toggle i');
       icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
     }
 
     function filterDevices() {
-  try {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) throw new Error("Search input element not found");
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    console.log("[DEBUG] Search term:", searchTerm);
-    console.log("[DEBUG] Device count before filter:", Object.keys(allDevices).length);
+      try {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) throw new Error("Search input element not found");
 
-    if (!searchTerm) {
-      currentDevices = {...allDevices};
-      renderDevices();
-      return;
-    }
+        const searchTerm = searchInput.value.toLowerCase();
+        console.log("[DEBUG] Search term:", searchTerm);
+        console.log("[DEBUG] Device count before filter:", Object.keys(allDevices).length);
 
-    currentDevices = Object.entries(allDevices).reduce((result, [id, device]) => {
-      console.log(`[DEBUG] Checking device ${id}`, device);
-      
-      const matches = Object.entries(device).some(([key, value]) => {
-        const strValue = String(value).toLowerCase();
-        const found = strValue.includes(searchTerm);
-        if (found) console.log(`Match found in ${key}: ${value}`);
-        return found;
-      });
+        if (!searchTerm) {
+          currentDevices = { ...allDevices };
+          renderDevices();
+          return;
+        }
 
-      if (matches) result[id] = device;
-      return result;
-    }, {});
+        currentDevices = Object.entries(allDevices).reduce((result, [id, device]) => {
+          console.log(`[DEBUG] Checking device ${id}`, device);
 
-    console.log("[DEBUG] Filtered device count:", Object.keys(currentDevices).length);
-    renderDevices();
-    
-  } catch (error) {
-    console.error("Error in filterDevices:", error);
-    document.getElementById("devices").innerHTML = `
+          const matches = Object.entries(device).some(([key, value]) => {
+            const strValue = String(value).toLowerCase();
+            const found = strValue.includes(searchTerm);
+            if (found) console.log(`Match found in ${key}: ${value}`);
+            return found;
+          });
+
+          if (matches) result[id] = device;
+          return result;
+        }, {});
+
+        console.log("[DEBUG] Filtered device count:", Object.keys(currentDevices).length);
+        renderDevices();
+
+      } catch (error) {
+        console.error("Error in filterDevices:", error);
+        document.getElementById("devices").innerHTML = `
       <div class="error">
         Search failed: ${error.message}
       </div>
     `;
-  }
-}
-   function renderDevices() {
-  const container = document.getElementById("devices");
-  
-  // Handle empty state
-  if (!currentDevices || Object.keys(currentDevices).length === 0) {
-    container.innerHTML = `
+      }
+    }
+    function renderDevices() {
+      const container = document.getElementById("devices");
+
+      // Handle empty state
+      if (!currentDevices || Object.keys(currentDevices).length === 0) {
+        container.innerHTML = `
       <div class="no-results">
         <i class="fas fa-search" style="font-size: 50px; margin-bottom: 15px;"></i>
         <h3>No Matching Devices Found</h3>
         <p>Try adjusting your search query</p>
       </div>
     `;
-    return;
-  }
+        return;
+      }
 
-  // Create devices grid
-  container.innerHTML = '<div class="devices-grid"></div>';
-  const grid = container.querySelector('.devices-grid');
-  
-  // Render each device card
-  Object.entries(currentDevices).forEach(([id, device]) => {
-    const card = document.createElement("div");
-    card.className = "device-card";
-    card.innerHTML = `
+      // Create devices grid
+      container.innerHTML = '<div class="devices-grid"></div>';
+      const grid = container.querySelector('.devices-grid');
+
+      // Render each device card
+      Object.entries(currentDevices).forEach(([id, device]) => {
+        const card = document.createElement("div");
+        card.className = "device-card";
+        card.innerHTML = `
       <div class="device-header">
         <h3 class="device-title">${device.sn || "Unknown Device"}</h3>
         <div class="device-status"></div>
@@ -368,9 +368,9 @@
         <span class="detail-value">${device.last_seen || "Unknown"}</span>
       </div>
     `;
-    grid.appendChild(card);
-  });
-}
+        grid.appendChild(card);
+      });
+    }
     // Go to admin page
     function goToAdminPage() {
       window.location.href = "admin.html";
@@ -378,18 +378,21 @@
 
     // Auth check
     auth.onAuthStateChanged(user => {
-    if (!user) {
-       clearSession();
-      window.location.href = "login.html";
-    return;
-  }
-  if (!sessionSnapshot.exists() || 
-      !localSession || 
-      localSession.uid !== user.uid) {
-     clearSession();
-    window.location.href = "login.html";
-    return;
-  }
+      if (!user) {
+        clearSession();
+        window.location.href = "login.html";
+        return;
+      }
+      db.ref("sessions/" + user.uid).once("value").then(sessionSnapshot => {
+        if (!sessionSnapshot.exists() ||
+          !localSession ||
+          localSession.uid !== user.uid) {
+          clearSession();
+          window.location.href = "login.html";
+          return;
+        }
+      });
+
       // Check if user is admin
       db.ref("admins/" + user.uid).once("value").then(snap => {
         if (snap.exists()) {
@@ -397,14 +400,14 @@
         }
         loadDashboard();
         setInterval(() => {
-    db.ref(`sessions/${user.uid}/lastActive`).set(Date.now());
-  }, 5 * 60 * 1000);
+          db.ref(`sessions/${user.uid}/lastActive`).set(Date.now());
+        }, 5 * 60 * 1000);
       });
     });
 
     function loadDashboard() {
       const container = document.getElementById("devices");
-      
+
       // Show loading state
       container.innerHTML = `
         <div class="loading">
@@ -412,11 +415,11 @@
         </div>
       `;
 
-      db.ref("devices").on("value", 
+      db.ref("devices").on("value",
         (snap) => {
           const data = snap.val() || {};
           allDevices = snap.val() || {};
-          currentDevices = {...allDevices};
+          currentDevices = { ...allDevices };
           if (Object.keys(data).length === 0) {
             container.innerHTML = `
               <div class="empty-state">
@@ -431,7 +434,7 @@
           // Create device cards
           container.innerHTML = '<div class="devices-grid"></div>';
           const grid = container.querySelector('.devices-grid');
-          
+
           Object.entries(data).forEach(([id, dev]) => {
             const card = document.createElement("div");
             card.className = "device-card";
@@ -459,7 +462,7 @@
             `;
             grid.appendChild(card);
           });
-        }, 
+        },
         (error) => {
           console.error("Failed to load devices:", error);
           container.innerHTML = `
@@ -476,22 +479,23 @@
       );
     }
     // Logout function
-async function logout() {
-  const user = auth.currentUser;
-  if (user) {
-    await db.ref(`sessions/${user.uid}`).remove();
-  }
-  localStorage.removeItem('session');
-  await auth.signOut();
-  window.location.href = "login.html";
-}
-async function clearSession() {
-  const session = JSON.parse(localStorage.getItem('session'));
-  if (session?.uid) {
-    await db.ref(`sessions/${session.uid}`).remove();
-  }
-  localStorage.removeItem('session');
-}
+    async function logout() {
+      const user = auth.currentUser;
+      if (user) {
+        await db.ref(`sessions/${user.uid}`).remove();
+      }
+      localStorage.removeItem('session');
+      await auth.signOut();
+      window.location.href = "login.html";
+    }
+    async function clearSession() {
+      const session = JSON.parse(localStorage.getItem('session'));
+      if (session?.uid) {
+        await db.ref(`sessions/${session.uid}`).remove();
+      }
+      localStorage.removeItem('session');
+    }
   </script>
 </body>
+
 </html>
