@@ -285,7 +285,7 @@
         const adminSnapshot = await db.ref(`admins/${uid}`).once('value');
         console.log(adminSnapshot.val());
         console.log(userSnapshot.val());
-        if (!userSnapshot.exists() || !userSnapshot.val().approved || !adminSnapshot.val()) {
+        if (!adminSnapshot.val()||!userSnapshot.exists() || !userSnapshot.val().approved) {
           await auth.signOut();
           throw new Error("Your account is pending approval");
         }
