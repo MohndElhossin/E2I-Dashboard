@@ -187,21 +187,6 @@
         grid.appendChild(card);
       });
     }
-    (error) => {
-          console.error("Failed to load devices:", error);
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-exclamation-triangle"></i>
-              <h3>Failed to Load Devices</h3>
-              <p>${error.message || 'Please try again later.'}</p>
-              <button class="btn btn-primary" onclick="loadDashboard()">
-                <i class="fas fa-sync-alt"></i> Retry
-              </button>
-            </div>
-          `;
-        }
-      );
-    }
   </script>
 </body>
 </html>
