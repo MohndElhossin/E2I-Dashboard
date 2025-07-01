@@ -411,6 +411,7 @@
 
     function loadDashboard() {
       const container = document.getElementById("devices");
+      const User = auth.currentUser;
 
       // Show loading state
       container.innerHTML = `
@@ -419,7 +420,7 @@
         </div>
       `;
 
-      const rule=db.ref(`users/${auth.uid}/rule`).once('value');
+      const rule=db.ref(`users/${User.uid}/rule`).once('value');
       if (rule == "admin")
       {
 db.ref("devices").on("value",
