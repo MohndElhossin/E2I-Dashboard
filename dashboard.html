@@ -423,7 +423,7 @@
       const rule= await db.ref(`users/${User.uid}/rule`).once('value');
       if (rule == "admin")
       {
-db.ref("devices").on("value",
+        await db.ref("devices").on("value",
         (snap) => {
           const data = snap.val() || {};
           allDevices = snap.val() || {};
@@ -432,7 +432,7 @@ db.ref("devices").on("value",
       }
       else
       {
-     db.ref("devices")
+     await db.ref("devices")
   .orderByChild("customer")
   .equalTo(rule.val())
   .once("value", (snap) => {
