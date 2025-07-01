@@ -10,7 +10,7 @@ const routes = {
 // Routing logic
 async function loadView(viewFile) {
   try {
-    const res = await fetch(`views/${viewFile}`);
+    const res = await fetch(`../views/${viewFile}`);
     const html = await res.text();
     document.getElementById("app").innerHTML = html;
   } catch (err) {
