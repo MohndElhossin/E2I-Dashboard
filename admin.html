@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script src="firebaseConfig.js"></script>
 
   <!-- Font Awesome -->
@@ -369,6 +370,8 @@
     await db.ref("pending_users/" + sanitizedEmail).remove();
     await db.ref().update(updates);
     alert(`Approved user: ${userData.email}`);
+    emailjs.init("MlNZk8LmngMq9Ao4n"); // Replace with your public key
+    sendCustomerEmail(userData.email,"User");
     loadPendingUsers();
     Operation="idle";
   } catch (error) {
@@ -393,6 +396,18 @@
         showError("Logout failed: " + error.message);
       });
     }
+     function sendCustomerEmail(email, name) {
+    emailjs.send("service_ee5ve7c", "template_7uy7vwo", {
+      to_email: email,
+      user_name: name,
+      message: "Your account has been created and is pending approval."
+    })
+    .then(() => {
+      console.log("Email sent successfully");
+    }, (err) => {
+      console.error("Failed to send email:", err);
+    });
+  }
   </script>
 </body>
 </html>
