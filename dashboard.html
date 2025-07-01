@@ -409,7 +409,7 @@
       });
     });
 
-    function loadDashboard() {
+   async function loadDashboard() {
       const container = document.getElementById("devices");
       const User = auth.currentUser;
 
@@ -420,7 +420,7 @@
         </div>
       `;
 
-      const rule=db.ref(`users/${User.uid}/rule`).once('value');
+      const rule= await db.ref(`users/${User.uid}/rule`).once('value');
       if (rule == "admin")
       {
 db.ref("devices").on("value",
