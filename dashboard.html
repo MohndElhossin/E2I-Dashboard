@@ -419,11 +419,27 @@
         </div>
       `;
 
-      db.ref("devices").on("value",
+      const rule=db.ref(`users/${auth.uid}/rule`).val();
+      if (rule == "admin")
+      {
+db.ref("devices").on("value",
         (snap) => {
           const data = snap.val() || {};
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
+          });
+      }
+      else
+      {
+     db.ref("devices")
+  .orderByChild("customer")
+  .equalTo(rule)
+  .once("value", (snap) => {
+          const data = snap.val() || {};
+          allDevices = snap.val() || {};
+          currentDevices = { ...allDevices };
+          });
+        }
           if (Object.keys(data).length === 0) {
             container.innerHTML = `
               <div class="empty-state">
@@ -465,7 +481,6 @@
               </div>
             `;
             grid.appendChild(card);
-          });
         },
         (error) => {
           console.error("Failed to load devices:", error);
