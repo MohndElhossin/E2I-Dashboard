@@ -264,7 +264,7 @@
         if (!isAdmin && Operation === "idle") {
           showError("Access denied — Admins only.");
           auth.signOut().then(() => {
-            window.location.href = "login.html";
+                      location.hash ="#login";
           });
           return;
         }

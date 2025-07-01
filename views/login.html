@@ -235,7 +235,7 @@
       </form>
 
       <div class="auth-footer">
-        <a href="signup.html">Create account</a> •
+        <a href="#signup">Create account</a> •
         <a href="#" onclick="forgotPassword()">Forgot password?</a> •
       </div>
     </div>
@@ -317,7 +317,7 @@
           created: formatted
         }));
 
-        window.location.href = "dashboard.html";
+          location.hash = "#dashboard";
 
       } catch (error) {
         console.error("Login error:", error);

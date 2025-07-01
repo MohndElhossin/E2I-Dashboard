@@ -1,5 +1,3 @@
-
-
 // Define your hash-based routes
 const routes = {
   "": "login.html",
