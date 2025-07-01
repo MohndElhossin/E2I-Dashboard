@@ -425,7 +425,6 @@
       {
         await db.ref("devices").on("value",
         (snap) => {
-          const data = snap.val() || {};
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
@@ -436,12 +435,11 @@
   .orderByChild("customer")
   .equalTo(rule.val())
   .once("value", (snap) => {
-          const data = snap.val() || {};
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
         }
-          if (Object.keys(data).length === 0) {
+          if (Object.keys(allDevices).length === 0) {
             container.innerHTML = `
               <div class="empty-state">
                 <i class="fas fa-box-open"></i>
@@ -456,7 +454,7 @@
           container.innerHTML = '<div class="devices-grid"></div>';
           const grid = container.querySelector('.devices-grid');
 
-          Object.entries(data).forEach(([id, dev]) => {
+          Object.entries(allDevices).forEach(([id, dev]) => {
             const card = document.createElement("div");
             card.className = "device-card";
             card.innerHTML = `
