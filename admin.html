@@ -371,7 +371,7 @@
     await db.ref().update(updates);
     alert(`Approved user: ${userData.email}`);
     emailjs.init("MlNZk8LmngMq9Ao4n"); // Replace with your public key
-    sendCustomerEmail(userData.email,"User");
+    await sendCustomerEmail(userData.email);
     loadPendingUsers();
     Operation="idle";
   } catch (error) {
@@ -397,10 +397,9 @@
         showError("Logout failed: " + error.message);
       });
     }
-     function sendCustomerEmail(email, name) {
+     function sendCustomerEmail(email) {
     emailjs.send("service_ee5ve7c", "template_7uy7vwo", {
       to_email: email,
-      user_name: name,
       message: "Your account has been created and is pending approval."
     })
     .then(() => {
