@@ -296,7 +296,7 @@
           throw new Error("Your account is pending approval");
         }
         else{
-          throw new Error("No matching account please sign up.");
+          throw new Error("auth/user-not-found");
         }
 
         const timestamp = Date.now();              

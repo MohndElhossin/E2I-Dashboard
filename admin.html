@@ -303,7 +303,7 @@
               card.className = "user-card";
              card.innerHTML = `
   <div class="user-email">${email || "No email provided"}</div>
-  <input type="text" id="rule-${child.key}" placeholder="Enter role/rule" class="rule-input" />
+  <input type="text" id="rule-${child.key}" placeholder="Enter role" class="rule-input" />
   <div class="user-actions">
     <button class="btn btn-success" onclick="approveUser('${child.key}')">
       <i class="fas fa-check"></i> Approve
