@@ -292,12 +292,13 @@
           await auth.signOut();
           throw new Error("Your account is pending approval");
         }
-        else if(!userSnapshot.exists())
-        {
-          await auth.signOut();
-          throw new Error("No matching account please Sign up.");
+        else{
+          alert("Welcome Back");
         }
 
+        const timestamp = Date.now();              
+        const date = new Date(timestamp);
+        const formatted = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
         // Create session timestamp
         const sessionData = {
           active: true,
@@ -309,7 +310,7 @@
         await db.ref(`sessions/${uid}`).set(sessionData);
         localStorage.setItem('session', JSON.stringify({
           uid: uid,
-          created: Date.now()
+          created: formatted
         }));
 
         window.location.href = "dashboard.html";
