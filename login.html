@@ -287,10 +287,15 @@
         if (adminSnapshot.val()) {
          
         }
-        else if(!userSnapshot.exists() || !userSnapshot.val().approved)
+        else if(userSnapshot.exists() && !userSnapshot.val().approved)
         {
           await auth.signOut();
           throw new Error("Your account is pending approval");
+        }
+        else if(!userSnapshot.exists())
+        {
+          await auth.signOut();
+          throw new Error("No matching account please Sign up.");
         }
 
         // Create session timestamp

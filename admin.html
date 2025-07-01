@@ -390,6 +390,7 @@
   }
 }
     function logout() {
+      clearSession();
       auth.signOut().then(() => {
         window.location.href = "login.html";
       }).catch(error => {
@@ -408,6 +409,13 @@
       console.error("Failed to send email:", err);
     });
   }
+  async function clearSession() {
+      const session = JSON.parse(localStorage.getItem('session'));
+      if (session?.uid) {
+        await db.ref(`sessions/${session.uid}`).remove();
+      }
+      localStorage.removeItem('session');
+    }
   </script>
 </body>
 </html>
