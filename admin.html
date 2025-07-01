@@ -302,14 +302,12 @@
               const card = document.createElement("div");
               card.className = "user-card";
              card.innerHTML = `
-  <div class="user-header">
-    <div class="user-email">${email || "No email provided"}</div>
-    <div class="user-actions">
-      <input type="text" id="rule-${child.key}" placeholder="Enter role/rule" class="rule-input" />
-      <button class="btn btn-success" onclick="approveUser('${child.key}')">
-        <i class="fas fa-check"></i> Approve
-      </button>
-    </div>
+  <div class="user-email">${email || "No email provided"}</div>
+  <input type="text" id="rule-${child.key}" placeholder="Enter role/rule" class="rule-input" />
+  <div class="user-actions">
+    <button class="btn btn-success" onclick="approveUser('${child.key}')">
+      <i class="fas fa-check"></i> Approve
+    </button>
   </div>
   <div class="user-meta">
     <small>UID: ${child.key}</small>
