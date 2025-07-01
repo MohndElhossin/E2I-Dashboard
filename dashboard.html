@@ -434,7 +434,7 @@ db.ref("devices").on("value",
       {
      db.ref("devices")
   .orderByChild("customer")
-  .equalTo(rule)
+  .equalTo(rule.val())
   .once("value", (snap) => {
           const data = snap.val() || {};
           allDevices = snap.val() || {};
