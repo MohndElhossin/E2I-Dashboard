@@ -345,6 +345,8 @@
 
     // Store admin email for reauthentication
     const adminEmail = adminUser.email;
+    const sanitizedEmail = userData.email.replace(/\./g, '_').replace(/@/g, '_');
+
     Operation="admin";
     // Create the auth account
     const userCredential = await auth.createUserWithEmailAndPassword(
@@ -358,17 +360,13 @@
 
     // Update database records
     const updates = {
-      [`pending_users/${pendingId}/approved`]: true,
-      [`pending_users/${pendingId}/approved_by`]: adminUser.uid,
-      [`pending_users/${pendingId}/approved_at`]: Date.now(),
-      [`pending_users/${pendingId}/password`]: null, // Remove password
       [`users/${uid}`]: { // Use the Auth-generated UID
         email: userData.email,
         approved: true,
         created_at: userData.created_at || Date.now()
       }
     };
-
+    await db.ref("pending_users/" + sanitizedEmail).remove();
     await db.ref().update(updates);
     alert(`Approved user: ${userData.email}`);
     loadPendingUsers();
