@@ -399,7 +399,7 @@
     }
      function sendCustomerEmail(email) {
     emailjs.send("service_ee5ve7c", "template_7uy7vwo", {
-      to_email: email,
+      email: email,
     })
     .then(() => {
       console.log("Email sent successfully");
