@@ -198,6 +198,13 @@
         grid-template-columns: 1fr;
       }
     }
+    .rule-input {
+    margin-right: 8px;
+    padding: 0.3em 0.5em;
+    font-size: 0.85em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
   </style>
 </head>
 <body data-theme="light">
@@ -294,19 +301,20 @@
               hasPendingUsers = true;
               const card = document.createElement("div");
               card.className = "user-card";
-              card.innerHTML = `
-                <div class="user-header">
-                  <div class="user-email">${email || "No email provided"}</div>
-                  <div class="user-actions">
-                    <button class="btn btn-success" onclick="approveUser('${child.key}')">
-                      <i class="fas fa-check"></i> Approve
-                    </button>
-                  </div>
-                </div>
-                <div class="user-meta">
-                  <small>UID: ${child.key}</small>
-                </div>
-              `;
+             card.innerHTML = `
+  <div class="user-header">
+    <div class="user-email">${email || "No email provided"}</div>
+    <div class="user-actions">
+      <input type="text" id="rule-${child.key}" placeholder="Enter role/rule" class="rule-input" />
+      <button class="btn btn-success" onclick="approveUser('${child.key}')">
+        <i class="fas fa-check"></i> Approve
+      </button>
+    </div>
+  </div>
+  <div class="user-meta">
+    <small>UID: ${child.key}</small>
+  </div>
+`;
               grid.appendChild(card);
             }
           });
@@ -337,8 +345,15 @@
     const adminSnapshot = await db.ref(`admins/${adminUser.uid}`).once('value');
     if (!adminSnapshot.exists()) {
       throw new Error("You don't have admin privileges");
+      logout();
     }
+    const ruleInput = document.getElementById(`rule-${pendingId}`);
+    const rule = ruleInput ? ruleInput.value.trim() : "";
 
+    if (!rule) {
+    alert("Please assign a rule/role before approving.");
+    return;
+  }
     // Get pending user data
     const pendingSnapshot = await db.ref(`pending_users/${pendingId}`).once('value');
     const userData = pendingSnapshot.val();
@@ -364,6 +379,7 @@
       [`users/${uid}`]: { // Use the Auth-generated UID
         email: userData.email,
         approved: true,
+        rule: rule,
         created_at: userData.created_at || Date.now()
       }
     };
