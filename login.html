@@ -320,7 +320,7 @@
 
       } catch (error) {
         console.error("Login error:", error);
-        alert(error.message);
+        getFriendlyErrorMessage(error.message);
       }
     }
 
