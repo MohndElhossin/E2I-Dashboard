@@ -348,7 +348,7 @@
         card.className = "device-card";
         card.innerHTML = `
       <div class="device-header">
-        <h3 class="device-title">${device.sn || "Unknown Device"}</h3>
+        <h3 class="device-title">${id || "Unknown Device"}</h3>
         <div class="device-status"></div>
       </div>
       <div class="device-detail">
@@ -438,7 +438,7 @@
             card.className = "device-card";
             card.innerHTML = `
               <div class="device-header">
-                <h3 class="device-title">${dev || "Unknown Device"}</h3>
+                <h3 class="device-title">${id || "Unknown Device"}</h3>
                 <div class="device-status"></div>
               </div>
               <div class="device-detail">
