@@ -400,7 +400,6 @@
      function sendCustomerEmail(email) {
     emailjs.send("service_ee5ve7c", "template_7uy7vwo", {
       to_email: email,
-      message: "Your account has been created and is pending approval."
     })
     .then(() => {
       console.log("Email sent successfully");
