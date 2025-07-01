@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --card: #ffffff;
+      --primary: #4361ee;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --border: #e0e0e0;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #f5f5f5;
+      --card: #1e1e1e;
+      --border: #333333;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-header h2 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .auth-header p {
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #7f8c8d;
+    }
+
+    .auth-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .loading {
+      display: none;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+     .waiting-approval {
+      text-align: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+    }
+    .hidden {
+    display: none;
+  }
+  </style>
+</head>
+<body data-theme="light">
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+        <p>Register for a new account</p>
+      </div>
+
+      <form onsubmit="signup(event)">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-control" 
+            placeholder="Enter your email" 
+            required
+          >
+          <div id="emailError" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-control" 
+            placeholder="Create a password" 
+            required
+            minlength="6"
+          >
+          <div id="passwordError" class="error-message"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <i class="fas fa-user-plus"></i> Sign Up
+        </button>
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </div>
+  </div>
+<div id="waitingApproval" class="waiting-approval">
+    <i class="fas fa-clock" style="font-size: 3em; color: #4361ee;"></i>
+    <h3>Waiting for Approval</h3>
+    <p>Your account is pending admin approval. You'll receive an email when your account is activated.</p>
+    <p><a href="login.html">Return to Login</a></p>
+  </div>
+  <!-- Success message container with ID -->
+  <div id="successMessage" class="hidden">
+    <i class="fas fa-check-circle" style="color: green; font-size: 3em;"></i>
+    <h3>Registration Successful!</h3>
+    <p>Your account is pending admin approval.</p>
+    <p>You'll receive an email when your account is activated.</p>
+    <p><a href="login.html">Return to Login</a></p>
+  </div>
+  <script>
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+   async function signup(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  
+  try {
+    // Store in pending_users without creating auth account
+    const sanitizedEmail = email.replace(/\./g, '_').replace(/@/g, '_');
+
+     const timestamp = Date.now();              
+        const date = new Date(timestamp);
+        const formatted = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        
+// Save under pending_users/sanitizedEmail
+await db.ref("pending_users/" + sanitizedEmail).set({
+  email: email,
+  password: password,  // For dev/demo only, never store raw password in real apps
+  approved: false,
+  created_at: formatted
+    });
+
+    // Show success message
+    document.getElementById("successMessage").style.display = "block";
+    
+  } catch (error) {
+    console.error("Signup error:", error);
+    getFriendlyErrorMessage(error.message);
+  }
+}
+    // Convert Firebase error codes to friendly messages
+    function getFriendlyErrorMessage(code) {
+      switch(code) {
+        case "auth/email-already-in-use":
+          return "This email is already registered";
+        case "auth/invalid-email":
+          return "Please enter a valid email address";
+        case "auth/weak-password":
+          return "Password should be at least 6 characters";
+        case "auth/operation-not-allowed":
+          return "Email/password accounts are not enabled";
+        default:
+          return "An error occurred. Please try again";
+      }
+    }
+  </script>
+</body>
+</html>
