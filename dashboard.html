@@ -419,7 +419,7 @@
         </div>
       `;
 
-      const rule=db.ref(`users/${auth.uid}/rule`).val();
+      const rule=db.ref(`users/${auth.uid}/rule`).once('value');
       if (rule == "admin")
       {
 db.ref("devices").on("value",

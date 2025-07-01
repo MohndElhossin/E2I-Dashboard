@@ -280,8 +280,8 @@
         const uid = userCredential.user.uid;
 
         // Check if user is approved
-        const userSnapshot = (await db.ref(`users/${uid}`).once('value'))||false;
-        const pending_userSnapshot = (await db.ref(`pending_users/${uid}`).once('value'))||false;
+        const userSnapshot = (await db.ref(`users/${uid}`).once('value'));
+        const pending_userSnapshot = (await db.ref(`pending_users/${uid}`).once('value'));
 
         const adminSnapshot = await db.ref(`admins/${uid}`).once('value');
         console.log(adminSnapshot.val());
