@@ -38,6 +38,7 @@ firebase.database().ref("siteStatus").once("value").then(snapshot => {
   if (snapshot.val() === "disabled") {
     loadView("maintenance.html");
   } else {
+    console.log("Site is enabled, loading view...");
     router(); // Load view based on hash
   }
 });
