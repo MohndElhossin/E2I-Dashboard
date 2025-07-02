@@ -289,7 +289,6 @@
         if (adminSnapshot.val() || userSnapshot.val()) 
         {
           alert("Welcome Back");
-          window.location.hash = "#dashboard";
         }
         else if(pending_userSnapshot.exists() && !pending_userSnapshot.val().approved)
         {
