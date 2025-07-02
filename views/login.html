@@ -324,13 +324,7 @@
       }
     }
 
-    // Check for existing session on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('session')) {
-        // Clear any existing session when returning to login
-        clearSession();
-      }
-    });
+   
 
     // Helper function to clear session
     async function clearSession() {
