@@ -429,6 +429,7 @@
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
+          await renderDevices();
       }
       else
       {
@@ -439,9 +440,9 @@
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
+          await renderDevices();
         }
         console.log("loading  devices");
-        await renderDevices();
     }
     // Logout function
     async function logout() {
