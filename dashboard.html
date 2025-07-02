@@ -441,62 +441,7 @@
           });
         }
         console.log("loading  devices");
-          if (Object.keys(allDevices).length === 0) {
-            container.innerHTML = `
-              <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <h3>No Devices Found</h3>
-                <p>There are currently no devices registered in the system.</p>
-              </div>
-            `;
-            return;
-          }
-
-          // Create device cards
-          container.innerHTML = '<div class="devices-grid"></div>';
-          const grid = container.querySelector('.devices-grid');
-
-          Object.entries(allDevices).forEach(([id, dev]) => {
-            const card = document.createElement("div");
-            card.className = "device-card";
-            card.innerHTML = `
-              <div class="device-header">
-                <h3 class="device-title">${id || "Unknown Device"}</h3>
-                <div class="device-status"></div>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Hardware:</span>
-                <span class="detail-value">${dev.hw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Software:</span>
-                <span class="detail-value">${dev.sw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Customer:</span>
-                <span class="detail-value">${dev.customer || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Last Seen:</span>
-                <span class="detail-value">${dev.last_seen || "Unknown"}</span>
-              </div>
-            `;
-            grid.appendChild(card);
-        },
-        (error) => {
-          console.error("Failed to load devices:", error);
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-exclamation-triangle"></i>
-              <h3>Failed to Load Devices</h3>
-              <p>${error.message || 'Please try again later.'}</p>
-              <button class="btn btn-primary" onclick="loadDashboard()">
-                <i class="fas fa-sync-alt"></i> Retry
-              </button>
-            </div>
-          `;
-        }
-      );
+        await renderDevices();
     }
     // Logout function
     async function logout() {
