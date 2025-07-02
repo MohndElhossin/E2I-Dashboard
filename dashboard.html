@@ -402,7 +402,7 @@
         if (snap.exists()) {
           document.getElementById("admin-btn-container").style.display = "block";
         }
-        loadDashboard();
+         loadDashboard();
         setInterval(() => {
           db.ref(`sessions/${user.uid}/lastActive`).set(Date.now());
         }, 5 * 60 * 1000);
@@ -440,6 +440,7 @@
           currentDevices = { ...allDevices };
           });
         }
+        console.log("loading  devices");
           if (Object.keys(allDevices).length === 0) {
             container.innerHTML = `
               <div class="empty-state">
