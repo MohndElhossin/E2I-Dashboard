@@ -429,6 +429,7 @@
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
+          console.log("All devices loaded:", Object.keys(allDevices).length);
           await renderDevices();
       }
       else
