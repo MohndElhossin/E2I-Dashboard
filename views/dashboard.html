@@ -292,8 +292,6 @@
         if (!searchInput) throw new Error("Search input element not found");
 
         const searchTerm = searchInput.value.toLowerCase();
-        console.log("[DEBUG] Search term:", searchTerm);
-        console.log("[DEBUG] Device count before filter:", Object.keys(allDevices).length);
 
         if (!searchTerm) {
           currentDevices = { ...allDevices };
@@ -302,12 +300,10 @@
         }
 
         currentDevices = Object.entries(allDevices).reduce((result, [id, device]) => {
-          console.log(`[DEBUG] Checking device ${id}`, device);
 
           const matches = Object.entries(device).some(([key, value]) => {
             const strValue = String(value).toLowerCase();
             const found = strValue.includes(searchTerm);
-            if (found) console.log(`Match found in ${key}: ${value}`);
             return found;
           });
 
@@ -315,11 +311,9 @@
           return result;
         }, {});
 
-        console.log("[DEBUG] Filtered device count:", Object.keys(currentDevices).length);
         renderDevices();
 
       } catch (error) {
-        console.error("Error in filterDevices:", error);
         document.getElementById("devices").innerHTML = `
       <div class="error">
         Search failed: ${error.message}
@@ -394,7 +388,9 @@
           return;
         }
       });
-
+const timestamp = Date.now();              
+        const date = new Date(timestamp);
+        const formatted = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
       // Check if user is admin
       db.ref("admins/" + user.uid).once("value").then(snap => {
         if (snap.exists()) {
@@ -402,7 +398,7 @@
         }
         loadDashboard();
         setInterval(() => {
-          db.ref(`sessions/${user.uid}/lastActive`).set(Date.now());
+          db.ref(`sessions/${user.uid}/lastActive`).set(formatted);
         }, 5 * 60 * 1000);
       });
     });
@@ -419,9 +415,9 @@
       `;
 
       const rule= await db.ref(`users/${User.uid}/rule`).once('value');
-      if (rule == "admin")
+      if (rule.val() == "admin")
       {
-        await db.ref("devices").on("value",
+        await db.ref("devices").once("value",
         (snap) => {
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
@@ -437,62 +433,7 @@
           currentDevices = { ...allDevices };
           });
         }
-          if (Object.keys(allDevices).length === 0) {
-            container.innerHTML = `
-              <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <h3>No Devices Found</h3>
-                <p>There are currently no devices registered in the system.</p>
-              </div>
-            `;
-            return;
-          }
-
-          // Create device cards
-          container.innerHTML = '<div class="devices-grid"></div>';
-          const grid = container.querySelector('.devices-grid');
-
-          Object.entries(allDevices).forEach(([id, dev]) => {
-            const card = document.createElement("div");
-            card.className = "device-card";
-            card.innerHTML = `
-              <div class="device-header">
-                <h3 class="device-title">${id || "Unknown Device"}</h3>
-                <div class="device-status"></div>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Hardware:</span>
-                <span class="detail-value">${dev.hw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Software:</span>
-                <span class="detail-value">${dev.sw_version || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Customer:</span>
-                <span class="detail-value">${dev.customer || "N/A"}</span>
-              </div>
-              <div class="device-detail">
-                <span class="detail-label">Last Seen:</span>
-                <span class="detail-value">${dev.last_seen || "Unknown"}</span>
-              </div>
-            `;
-            grid.appendChild(card);
-        },
-        (error) => {
-          console.error("Failed to load devices:", error);
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-exclamation-triangle"></i>
-              <h3>Failed to Load Devices</h3>
-              <p>${error.message || 'Please try again later.'}</p>
-              <button class="btn btn-primary" onclick="loadDashboard()">
-                <i class="fas fa-sync-alt"></i> Retry
-              </button>
-            </div>
-          `;
-        }
-      );
+         renderDevices();
     }
     // Logout function
     async function logout() {

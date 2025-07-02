@@ -293,10 +293,10 @@
         else if(pending_userSnapshot.exists() && !pending_userSnapshot.val().approved)
         {
           await auth.signOut();
-          throw new Error("Your account is pending approval");
+          alert("Your account is pending approval");
         }
         else{
-          throw new Error("auth/user-not-found");
+          alert("auth/user-not-found");
         }
 
         const timestamp = Date.now();              
@@ -308,7 +308,6 @@
           lastActive: formatted,
           ip: await getClientIP() // Optional
         };
-        console.log(uid);
         // Store session in database and localStorage
         await db.ref(`sessions/${uid}`).set(sessionData);
         localStorage.setItem('session', JSON.stringify({
@@ -319,8 +318,7 @@
           location.hash = "#dashboard";
 
       } catch (error) {
-        console.error("Login error:", error);
-        getFriendlyErrorMessage(error.message);
+        console.log("Login error:", error);
       }
     }
 
@@ -335,21 +333,6 @@
       localStorage.removeItem('session');
     }
     
-    // Convert Firebase error codes to friendly messages
-    function getFriendlyErrorMessage(code) {
-      switch (code) {
-        case "auth/user-not-found":
-          return "No account found with this email";
-        case "auth/wrong-password":
-          return "Incorrect password";
-        case "auth/invalid-email":
-          return "Please enter a valid email address";
-        case "auth/user-disabled":
-          return "This account has been disabled";
-        default:
-          return "Login failed. Please try again";
-      }
-    }
 
     // Password reset function
     async function forgotPassword() {
