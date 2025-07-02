@@ -423,6 +423,7 @@
       const rule= await db.ref(`users/${User.uid}/rule`).once('value');
       if (rule.val() == "admin")
       {
+        console.log("Admin user detected, loading all devices");
         await db.ref("devices").on("value",
         (snap) => {
           allDevices = snap.val() || {};
