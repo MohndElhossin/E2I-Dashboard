@@ -207,7 +207,7 @@
         <p>Register for a new account</p>
       </div>
 
-      <form onsubmit="signup(event)">
+      <form id="signupForm">
         <div class="form-group">
           <label for="email">Email Address</label>
           <input 
@@ -261,6 +261,8 @@
     <p><a href="#login">Return to Login</a></p>
   </div>
   <script>
+    document.getElementById("signupForm").addEventListener("submit", signup);
+
     const auth = firebase.auth();
     const db = firebase.database();
 
