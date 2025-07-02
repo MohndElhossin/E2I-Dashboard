@@ -28,6 +28,7 @@ async function loadView(viewFile) {
 }
 
 function router() {
+  console.log(`hash: ${location.hash}`);
   const hash = location.hash || "#login";
   const view = routes[hash] || "login.html";
   console.log(`Loading view for hash: ${view}`);
