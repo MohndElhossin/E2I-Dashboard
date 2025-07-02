@@ -294,8 +294,6 @@
         if (!searchInput) throw new Error("Search input element not found");
 
         const searchTerm = searchInput.value.toLowerCase();
-        console.log("[DEBUG] Search term:", searchTerm);
-        console.log("[DEBUG] Device count before filter:", Object.keys(allDevices).length);
 
         if (!searchTerm) {
           currentDevices = { ...allDevices };
@@ -304,12 +302,10 @@
         }
 
         currentDevices = Object.entries(allDevices).reduce((result, [id, device]) => {
-          console.log(`[DEBUG] Checking device ${id}`, device);
 
           const matches = Object.entries(device).some(([key, value]) => {
             const strValue = String(value).toLowerCase();
             const found = strValue.includes(searchTerm);
-            if (found) console.log(`Match found in ${key}: ${value}`);
             return found;
           });
 
@@ -317,7 +313,6 @@
           return result;
         }, {});
 
-        console.log("[DEBUG] Filtered device count:", Object.keys(currentDevices).length);
         renderDevices();
 
       } catch (error) {
@@ -423,14 +418,11 @@
       const rule= await db.ref(`users/${User.uid}/rule`).once('value');
       if (rule.val() == "admin")
       {
-        console.log("Admin user detected, loading all devices");
-        await db.ref("devices").on("value",
+        await db.ref("devices").once("value",
         (snap) => {
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
-          console.log("All devices loaded:", Object.keys(allDevices).length);
-          await renderDevices();
       }
       else
       {
@@ -441,9 +433,8 @@
           allDevices = snap.val() || {};
           currentDevices = { ...allDevices };
           });
-          await renderDevices();
         }
-        console.log("loading  devices");
+          renderDevices();
     }
     // Logout function
     async function logout() {
