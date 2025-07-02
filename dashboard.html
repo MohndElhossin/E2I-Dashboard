@@ -421,7 +421,7 @@
       `;
 
       const rule= await db.ref(`users/${User.uid}/rule`).once('value');
-      if (rule == "admin")
+      if (rule.val() == "admin")
       {
         await db.ref("devices").on("value",
         (snap) => {
