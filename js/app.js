@@ -9,14 +9,22 @@ const routes = {
 
 // Routing logic
 async function loadView(viewFile) {
-  try {
-    const res = await fetch(`views/${viewFile}`);
-    const html = await res.text();
-    console.log(html);
-    document.getElementById("app").innerHTML = html;
-  } catch (err) {
-    document.getElementById("app").innerHTML = "<h2>View not found</h2>";
-  }
+  const res = await fetch(`views/${viewFile}`);
+  const html = await res.text();
+  const app = document.getElementById("app");
+  app.innerHTML = html;
+
+  // Execute any <script> tags inside the view
+  const scripts = app.querySelectorAll("script");
+  scripts.forEach(script => {
+    const newScript = document.createElement("script");
+    if (script.src) {
+      newScript.src = script.src;
+    } else {
+      newScript.textContent = script.textContent;
+    }
+    document.body.appendChild(newScript);
+  });
 }
 
 function router() {
