@@ -276,25 +276,9 @@ await db.ref("pending_users/" + sanitizedEmail).set({
     document.getElementById("successMessage").style.display = "block";
     
   } catch (error) {
-    console.error("Signup error:", error);
-    getFriendlyErrorMessage(error.message);
+    console.log("Signup error:", error);
   }
 }
-    // Convert Firebase error codes to friendly messages
-    function getFriendlyErrorMessage(code) {
-      switch(code) {
-        case "auth/email-already-in-use":
-          return "This email is already registered";
-        case "auth/invalid-email":
-          return "Please enter a valid email address";
-        case "auth/weak-password":
-          return "Password should be at least 6 characters";
-        case "auth/operation-not-allowed":
-          return "Email/password accounts are not enabled";
-        default:
-          return "An error occurred. Please try again";
-      }
-    }
   </script>
 </body>
 </html>
