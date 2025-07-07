@@ -332,7 +332,7 @@
 
       // Render each device card
       Object.entries(currentDevices).forEach(([id, device]) => {
-         Object.entries(uidWrapper).forEach(([uid, data]) => {
+         Object.entries(device).forEach(([uid, data]) => {
         console.log("Device ID (UID):", id);
   console.log("Device Data:", device);
         const card = document.createElement("div");
