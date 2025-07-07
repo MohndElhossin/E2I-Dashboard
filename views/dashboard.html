@@ -332,8 +332,8 @@
 
       // Render each device card
       Object.entries(currentDevices).forEach(([id, device]) => {
-        console.log(device);
-        console.log(id);
+        console.log("Device ID (UID):", id);
+  console.log("Device Data:", device);
         const card = document.createElement("div");
         card.className = "device-card";
         card.innerHTML = `
