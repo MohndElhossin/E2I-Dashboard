@@ -332,9 +332,6 @@
 
       // Render each device card
       Object.entries(currentDevices).forEach(([id, device]) => {
-         Object.entries(device).forEach(([uid, data]) => {
-        console.log("Device ID (UID):", id);
-  console.log("Device Data:", device);
         const card = document.createElement("div");
         card.className = "device-card";
         card.innerHTML = `
@@ -344,25 +341,23 @@
       </div>
       <div class="device-detail">
         <span class="detail-label">Hardware:</span>
-        <span class="detail-value">${data.hw_version || "N/A"}</span>
+        <span class="detail-value">${device.hw_version || "N/A"}</span>
       </div>
       <div class="device-detail">
         <span class="detail-label">Software:</span>
-        <span class="detail-value">${data.sw_version || "N/A"}</span>
+        <span class="detail-value">${device.sw_version || "N/A"}</span>
       </div>
       <div class="device-detail">
         <span class="detail-label">Customer:</span>
-        <span class="detail-value">${data.customer || "N/A"}</span>
+        <span class="detail-value">${device.customer || "N/A"}</span>
       </div>
       <div class="device-detail">
         <span class="detail-label">Last Seen:</span>
-        <span class="detail-value">${data.last_seen || "Unknown"}</span>
+        <span class="detail-value">${device.last_seen || "Unknown"}</span>
       </div>
     `;
         grid.appendChild(card);
-      });
-      });
-        
+      });        
     }
     // Go to admin page
     function goToAdminPage() {
