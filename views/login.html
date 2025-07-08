@@ -270,8 +270,6 @@
         const pending_userSnapshot = (await db.ref(`pending_users/${uid}`).once('value'));
 
         const adminSnapshot = await db.ref(`admins/${uid}`).once('value');
-        console.log(adminSnapshot.val());
-        console.log(userSnapshot.val());
         if (adminSnapshot.val() || userSnapshot.val()) 
         {
           alert("Welcome Back");
@@ -304,7 +302,7 @@
           location.hash = "#dashboard";
 
       } catch (error) {
-        console.log("Login error:", error);
+        alert("Login error:", error);
       }
     }
 

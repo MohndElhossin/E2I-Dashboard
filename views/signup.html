@@ -276,7 +276,7 @@ await db.ref("pending_users/" + sanitizedEmail).set({
     document.getElementById("successMessage").style.display = "block";
     
   } catch (error) {
-    console.log("Signup error:", error);
+    alert("Signup error:", error);
   }
 }
   </script>
